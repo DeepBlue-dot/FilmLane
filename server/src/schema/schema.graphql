@@ -1,0 +1,48 @@
+type Query {
+  me: User
+  watchlist: [WatchlistItem!]!
+  watchHistory: [WatchHistory!]!
+  searchMovies(query: String!): [Movie!]!
+  getMovie(tmdbId: ID!): Movie
+}
+
+type Mutation {
+  signUp(email: String!, password: String!): AuthPayload
+  login(email: String!, password: String!): AuthPayload
+  addToWatchlist(tmdbId: ID!): WatchlistItem
+  recordWatchProgress(tmdbId: ID!, progress: Float!): WatchHistory
+}
+
+type User {
+  id: ID!
+  email: String!
+  watchlist: [WatchlistItem!]!
+  watchHistory: [WatchHistory!]!
+}
+
+type WatchlistItem {
+  id: ID!
+  tmdbId: ID!
+  addedAt: String!
+}
+
+type WatchHistory {
+  id: ID!
+  tmdbId: ID!
+  watchedAt: String!
+  progress: Float!
+}
+
+type Movie {
+  tmdbId: ID!
+  title: String!
+  overview: String
+  releaseDate: String
+  posterPath: String
+  backdropPath: String
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
