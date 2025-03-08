@@ -34,7 +34,6 @@ model WatchHistory {
   userId    Int
   tmdbId    Int
   watchedAt DateTime? @default(now()) @db.DateTime(0)
-  progress  Float?    @db.Float
   User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "WatchHistory_ibfk_1")
 
   @@index([tmdbId], map: "idx_tmdb")
