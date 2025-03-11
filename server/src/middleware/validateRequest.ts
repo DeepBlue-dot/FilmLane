@@ -7,7 +7,7 @@ const validationRequest: RequestHandler = async (req: Request, res: Response, ne
 
     if (Object.keys(errors).length > 0) {
         res.status(400).json({
-            status: "fail",
+            status: "failed",
             message: "Validation errors",
             errors: errors,
         });

@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import validationRequest from "../validateRequest.js";
 import prisma from "../../config/db.js";
 
-const validateUserRegistration = [
+export const validateUserRegistration = [
     body("username")
         .trim()
         .notEmpty()
@@ -42,9 +42,6 @@ const validateUserRegistration = [
         .notEmpty()
         .withMessage("Confirm Password is required")
         .custom((value, { req }) => {
-            if (!req.body.password) {
-                throw new Error("Password is required");
-            }
             if (value !== req.body.password) {
                 throw new Error("Passwords do not match");
             }
@@ -54,4 +51,18 @@ const validateUserRegistration = [
     validationRequest
 ]
 
-export { validateUserRegistration }
+export const userLoginValidator = [
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("Email is required")
+        .isEmail()
+        .withMessage("Invalid email format"),
+
+    body("password")
+        .notEmpty()
+        .withMessage("Password is required"),
+    
+    validationRequest,
+];
+

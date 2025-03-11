@@ -11,7 +11,7 @@ model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique(map: "email") @db.VarChar(255)
   passwordHash  String         @db.VarChar(255)
-  username      String?        @db.VarChar(50)
+  username      String        @db.VarChar(50)
   createdAt     DateTime?      @default(now()) @db.DateTime(0)
   updatedAt     DateTime?      @default(now()) @db.DateTime(0)
   WatchHistory  WatchHistory[]
