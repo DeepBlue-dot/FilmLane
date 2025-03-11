@@ -1,40 +1,28 @@
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
-import express, { json } from 'express';
-import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-import { Context } from './types/types.js';
-import { typeDefs } from './schema/schema.js';
-import { resolvers } from './resolvers/resolvers.js';
+import express, { Express } from "express";
+import cookieParser from "cookie-parser";
+import path from "path";
+import cors from "cors"
+import userRoutes from "./routes/userRoutes.js";
 
-const prisma = new PrismaClient();
-const app = express();
+const app: Express = express();
 
-const server = new ApolloServer<Context>({ 
-  typeDefs,
-  resolvers,
-});
+app.use(
+  cors({
+    origin: "http://localhost:5173", 
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], 
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-async function startServer() {
-  await server.start();
-  
-  app.use(
-    '/graphql',
-    cors<cors.CorsRequest>(),
-    json(),
-    expressMiddleware(server, {
-      context: async ({ req }) => ({
-        prisma,
-        token: req.headers.authorization,
-      }),
-    })
-  );
 
-  app.listen(4000, () => {
-    console.log(`🚀 Server ready at http://localhost:4000/graphql`);
-  });
-}
+app.use(express.json());
+app.use(cookieParser());
 
-startServer().catch((err) => {
-  console.error('Error starting server:', err);
-});
+app.use("/public/", express.static(path.join(process.env.PWD || "", "public")));
+app.use("/api/users", userRoutes)
+
+
+export default app;
+
+

@@ -7,26 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique(map: "token") @db.VarChar(255)
-  expiresAt DateTime @db.DateTime(0)
-  userId    Int
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "PasswordResetToken_ibfk_1")
-
-  @@index([userId], map: "userId")
-}
-
 model User {
-  id                 Int                  @id @default(autoincrement())
-  email              String               @unique(map: "email") @db.VarChar(255)
-  passwordHash       String               @db.VarChar(255)
-  username           String?              @db.VarChar(50)
-  createdAt          DateTime?            @default(now()) @db.DateTime(0)
-  updatedAt          DateTime?            @default(now()) @db.DateTime(0)
-  PasswordResetToken PasswordResetToken[]
-  WatchHistory       WatchHistory[]
-  WatchlistItem      WatchlistItem[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique(map: "email") @db.VarChar(255)
+  passwordHash  String         @db.VarChar(255)
+  username      String?        @db.VarChar(50)
+  createdAt     DateTime?      @default(now()) @db.DateTime(0)
+  updatedAt     DateTime?      @default(now()) @db.DateTime(0)
+  WatchHistory  WatchHistory[]
+  WatchlistItem WatchlistItem[]
 }
 
 model WatchHistory {
