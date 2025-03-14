@@ -4,6 +4,7 @@ import path from "path";
 import cors from "cors"
 import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import { authenticateUser } from "./middleware/authenticateUser.js";
 
 const app: Express = express();
 
@@ -19,6 +20,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(authenticateUser);
 
 app.use("/public/", express.static(path.join(process.env.PWD || "", "public")));
 app.use("/api/users", userRoutes)

@@ -66,6 +66,8 @@ export const userLogin: RequestHandler = async (req, res) => {
                     updatedAt: user.updatedAt,
                 }
             });
+
+            return;
         }
     }
 
@@ -73,6 +75,8 @@ export const userLogin: RequestHandler = async (req, res) => {
         status: "failed",
         message: "Invalid email or password",
     })
+
+    return
 }
 
 export const userLogOut: RequestHandler = async (req, res) => {
@@ -85,4 +89,6 @@ export const userLogOut: RequestHandler = async (req, res) => {
         status: "success",
         message: "Logged out successfully",
     });
+
+    return
 }
