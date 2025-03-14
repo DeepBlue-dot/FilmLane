@@ -34,6 +34,8 @@ export const userRegester: RequestHandler = async (req, res) => {
             updatedAt: user.updatedAt,
         }
     })
+
+    return
 };
 
 export const userLogin: RequestHandler = async (req, res) => {
