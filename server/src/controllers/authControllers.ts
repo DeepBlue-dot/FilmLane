@@ -10,7 +10,7 @@ const cookieOptions: CookieOptions = {
     ),
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    httpOnly: true // Typically added for security (recommended for cookies)
+    httpOnly: true 
 };
 
 export const userRegester: RequestHandler = async (req, res) => {
