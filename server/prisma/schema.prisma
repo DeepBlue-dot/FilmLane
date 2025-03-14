@@ -8,33 +8,32 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  email         String         @unique(map: "email") @db.VarChar(255)
-  passwordHash  String         @db.VarChar(255)
-  username      String        @db.VarChar(50)
-  createdAt     DateTime?      @default(now()) @db.DateTime(0)
-  updatedAt     DateTime?      @default(now()) @db.DateTime(0)
+  id            String          @id @default(uuid()) @db.Char(36)
+  email         String          @unique(map: "email") @db.VarChar(255)
+  passwordHash  String          @db.VarChar(255)
+  username      String          @db.VarChar(50)
+  createdAt     DateTime?       @default(now()) @db.DateTime(0)
+  updatedAt     DateTime?       @default(now()) @db.DateTime(0)
   WatchHistory  WatchHistory[]
   WatchlistItem WatchlistItem[]
 }
 
 model WatchHistory {
-  id        Int       @id @default(autoincrement())
-  userId    Int
+  id        String    @id @default(uuid()) @db.Char(36)
+  userId    String    @db.Char(36)
   tmdbId    Int
   watchedAt DateTime? @default(now()) @db.DateTime(0)
-  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "WatchHistory_ibfk_1")
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([tmdbId], map: "idx_tmdb")
-  @@index([userId], map: "idx_user")
+  @@index([userId], map: "WatchHistory_userId_fkey")
 }
 
 model WatchlistItem {
-  id      Int       @id @default(autoincrement())
-  userId  Int
+  id      String    @id @default(uuid()) @db.Char(36)
+  userId  String    @db.Char(36)
   tmdbId  Int
   addedAt DateTime? @default(now()) @db.DateTime(0)
-  User    User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "WatchlistItem_ibfk_1")
+  User    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tmdbId], map: "unique_watchlist")
 }
