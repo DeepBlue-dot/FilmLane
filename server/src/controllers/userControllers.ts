@@ -1,6 +1,8 @@
 import prisma from "../config/db.js";
 import asyncHandler from "../services/asyncHandler.js";
 import { parsePrismaQuery } from "../services/queryParser.js";
+import bcrypt from "bcryptjs";
+
 
 
 export const getUser = asyncHandler(
@@ -83,15 +85,49 @@ export const getAllUsers = asyncHandler(
     }
 )
 
-export const updateUser = asyncHandler(
+export const updateUserById  = asyncHandler(
     async (req, res, next) => {
-        
+
     }
 )
 
-export const updateUserById = asyncHandler(
-    async (req, res, next) => {
+export const updateUser= asyncHandler(
+    async (req: any, res, next) => {
 
+        const updateData = { ...req.body }
+
+        if (updateData.password) {
+            const salt = await bcrypt.genSalt(10);
+            const password = await bcrypt.hash(updateData.password, salt);
+            updateData.passwordHash = password
+            delete updateData.password
+            delete updateData.confirmPassword
+            delete updateData.oldPassword
+        }
+
+        const user = await prisma.user.update({
+            where: {
+                id: req.user
+            },
+            data: {
+                ...updateData
+            },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                createdAt: true,
+                updatedAt: true,
+                passwordHash: false
+            }
+        })
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                user
+            }
+        })
     }
 )
 
