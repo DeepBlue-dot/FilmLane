@@ -23,17 +23,21 @@ export const userRegester: RequestHandler = asyncHandler(
                 username: req.body.username,
                 email: req.body.email,
                 passwordHash: password,
+            },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                createdAt: true,
+                updatedAt: true,
+                passwordHash: false
             }
         })
 
         res.status(201).json({
             status: "success",
             data: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt,
+                user
             }
         })
         return
@@ -45,7 +49,7 @@ export const userLogin: RequestHandler = asyncHandler(
         const user = await prisma.user.findUnique({
             where: {
                 email
-            }
+            },
         })
 
         if (user) {
@@ -63,11 +67,13 @@ export const userLogin: RequestHandler = asyncHandler(
                 res.status(200).json({
                     status: "success",
                     data: {
-                        id: user.id,
-                        email: user.email,
-                        username: user.username,
-                        createdAt: user.createdAt,
-                        updatedAt: user.updatedAt,
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            username: user.username,
+                            createdAt: user.createdAt,
+                            updatedAt: user.updatedAt,
+                        }
                     }
                 });
 

@@ -6,21 +6,53 @@ import asyncHandler from "../services/asyncHandler.js";
 export const authenticateUser: RequestHandler = asyncHandler(
     async (req, res, next) => {
         const token = req.cookies.jwt
-        if (token) {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as { id: number };
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: decoded.id
-                },
-                select: { id: true }
-            });
-            if (!user) {
-                res.cookie("jwt", "loggedout", {
-                    expires: new Date(Date.now()), // Expire immediately
-                });
-            }
-            (req as any).user = user;
 
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || "") as { id: string };
+
+                const user = await prisma.user.findUnique({
+                    where: {
+                        id: decoded.id
+                    },
+                    select: { id: true }
+                });
+
+                if (!user) {
+                    res.cookie("jwt", "loggedout", {
+                        expires: new Date(Date.now()), // Expire immediately
+                    });
+
+                    res.status(401).json({
+                        status: "failed",
+                        message: "User no longer exists"
+                    })
+
+                    return;
+                }
+                (req as any).user = user.id;
+
+            } catch (error) {
+                res.status(401).json({
+                    status: "failed",
+                    message: "Invalid or expired token",
+                });
+
+                return
+            }
+        }
+        next()
+    })
+
+export const requireAuthentication: RequestHandler = asyncHandler(
+    async (req: any, res, next) => {
+        if (!req.user) {
+            res.status(401).json({
+                status: "failed",
+                message: "Unauthorized: Please login"
+            })
+
+            return
         }
         next()
     })

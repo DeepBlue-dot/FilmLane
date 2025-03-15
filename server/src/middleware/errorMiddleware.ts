@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-interface HttpError extends Error {
+export interface HttpError extends Error {
   statusCode?: number;
   status?: string;
   isOperational?: boolean;
