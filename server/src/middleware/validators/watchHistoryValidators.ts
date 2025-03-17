@@ -2,7 +2,7 @@ import { body } from "express-validator";
 import validationRequest from "../validateRequest.js";
 import prisma from "../../config/db.js";
 
-export const addWatchListItemValidator = [
+export const addWatchHistoryItemValidator = [
     body("tmdbId")
         .trim()
         .notEmpty()
