@@ -98,7 +98,7 @@ export const updateUserValidator = [
                 }
 
                 const user = await prisma.user.findUnique({
-                    where: { id: req.user },
+                    where: { id: req.userId },
                     select: { passwordHash: true }
                 });
 

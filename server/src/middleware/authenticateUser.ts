@@ -30,7 +30,7 @@ export const authenticateUser: RequestHandler = asyncHandler(
 
                     return;
                 }
-                (req as any).user = user.id;
+                (req as any).userId = user.id;
 
             } catch (error) {
                 res.status(401).json({
@@ -46,7 +46,7 @@ export const authenticateUser: RequestHandler = asyncHandler(
 
 export const requireAuthentication: RequestHandler = asyncHandler(
     async (req: any, res, next) => {
-        if (!req.user) {
+        if (!req.userId) {
             res.status(401).json({
                 status: "failed",
                 message: "Unauthorized: Please login"

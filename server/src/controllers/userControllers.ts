@@ -10,7 +10,7 @@ export const getUser = asyncHandler(
         const user = await prisma.user.findUnique(
             {
                 where: {
-                    id: req.user
+                    id: req.userId
                 },
                 select: {
                     id: true,
@@ -95,6 +95,7 @@ export const updateUser = asyncHandler(
     async (req: any, res, next) => {
 
         const updateData = { ...req.body }
+        updateData.updatedAt = new Date()
 
         if (updateData.password) {
             const salt = await bcrypt.genSalt(10);
@@ -105,12 +106,13 @@ export const updateUser = asyncHandler(
             delete updateData.oldPassword
         }
 
+
         const user = await prisma.user.update({
             where: {
-                id: req.user
+                id: req.userId
             },
             data: {
-                ...updateData
+                ...updateData,
             },
             select: {
                 id: true,
@@ -135,7 +137,7 @@ export const deleteUser = asyncHandler(
     async (req: any, res, next) => {
         const user = await prisma.user.delete({
             where: {
-                id: req.user
+                id: req.userId
             }
         })
 
