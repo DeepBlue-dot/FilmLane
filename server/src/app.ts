@@ -6,6 +6,8 @@ import userRoutes from "./routes/userRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import { authenticateUser } from "./middleware/authenticateUser.js";
 import { errorHandler, unknownURL } from "./middleware/errorMiddleware.js";
+import watchlistRoutes from "./routes/WatchlistRoutes.js";
+import watchHistoryRoutes from "./routes/watchHistoryRoutes.js";
 
 const app: Express = express();
 
@@ -25,6 +27,8 @@ app.use(authenticateUser);
 
 app.use("/public/", express.static(path.join(process.env.PWD || "", "public")));
 app.use("/api/users", userRoutes)
+app.use("/api/users", watchlistRoutes)
+app.use("/api/users", watchHistoryRoutes)
 app.use("/api/auth", authRoutes)
 
 app.all("*", unknownURL);

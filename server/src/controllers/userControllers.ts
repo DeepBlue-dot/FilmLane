@@ -85,13 +85,13 @@ export const getAllUsers = asyncHandler(
     }
 )
 
-export const updateUserById  = asyncHandler(
+export const updateUserById = asyncHandler(
     async (req, res, next) => {
 
     }
 )
 
-export const updateUser= asyncHandler(
+export const updateUser = asyncHandler(
     async (req: any, res, next) => {
 
         const updateData = { ...req.body }
@@ -132,13 +132,44 @@ export const updateUser= asyncHandler(
 )
 
 export const deleteUser = asyncHandler(
-    async (req, res, next) => {
+    async (req: any, res, next) => {
+        const user = await prisma.user.delete({
+            where: {
+                id: req.user
+            }
+        })
 
+        res.cookie("jwt", "loggedout", {
+            expires: new Date(Date.now() - 1000),
+            httpOnly: true,
+        });
+
+
+        res.status(204).json({
+            status: "success",
+            data: null,
+        });
     }
 )
 
 export const deleteUserById = asyncHandler(
     async (req, res, next) => {
+        const user = await prisma.user.delete({
+            where: {
+                id: req.params.id
+            }
+        })
+
+        res.cookie("jwt", "loggedout", {
+            expires: new Date(Date.now() - 1000),
+            httpOnly: true,
+        });
+
+
+        res.status(204).json({
+            status: "success",
+            data: null,
+        });
 
     }
 )
