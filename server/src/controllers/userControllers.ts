@@ -60,8 +60,8 @@ export const getUserById = asyncHandler(
 export const getAllUsers = asyncHandler(
     async (req, res, next) => {
         const result = parsePrismaQuery(req, {
-            allowedFields: ['id', 'email', 'createdAt'],
-            dateFields: ['createdAt'],
+            allowedFields: ['id', 'email', 'username', 'createdAt', 'updatedAt'],
+            dateFields: ['createdAt', 'updatedAt'],
             maxLimit: 50
         });
 

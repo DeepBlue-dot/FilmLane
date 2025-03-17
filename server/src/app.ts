@@ -27,8 +27,8 @@ app.use(authenticateUser);
 
 app.use("/public/", express.static(path.join(process.env.PWD || "", "public")));
 app.use("/api/users", userRoutes)
-app.use("/api/users", watchlistRoutes)
-app.use("/api/users", watchHistoryRoutes)
+app.use("/api", watchlistRoutes)
+app.use("/api", watchHistoryRoutes)
 app.use("/api/auth", authRoutes)
 
 app.all("*", unknownURL);

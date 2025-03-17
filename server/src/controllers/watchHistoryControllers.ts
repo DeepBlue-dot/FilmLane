@@ -100,9 +100,10 @@ export const getHistoryById = asyncHandler(
 
 export const addWatchHistoryItem = asyncHandler(
     async (req: any, res, next) => {
+        const tmdbIdInt = parseInt(req.body.tmdbId, 10);
         const newItem = await prisma.watchHistory.create({
             data: {
-                tmdbId: req.body.tmdbId,
+                tmdbId: tmdbIdInt,
                 userId: req.userId,
             }
         })

@@ -5,13 +5,13 @@ import { addWatchHistoryItemValidator } from "../middleware/validators/watchHist
 
 const watchHistoryRoutes = Router();
 
-watchHistoryRoutes.get("/users/:userId/watch-history", getWatchHistoryByUserId)
 watchHistoryRoutes.get("/users/me/watch-history", requireAuthentication,getUserWatchHistory)
+watchHistoryRoutes.get("/users/:userId/watch-history", getWatchHistoryByUserId)
 watchHistoryRoutes.post("/users/me/watch-history", requireAuthentication, addWatchHistoryItemValidator, addWatchHistoryItem)
-watchHistoryRoutes.get("/users/:userId/watch-history/:ItemId", getHistoryById)
 watchHistoryRoutes.get("/users/me/watch-history/:ItemId", getUserWatchHistory)
-watchHistoryRoutes.delete("/users/:userId/watch-history/:ItemId", deleteHistoryItemById)
+watchHistoryRoutes.get("/users/:userId/watch-history/:ItemId", getHistoryById)
 watchHistoryRoutes.delete("/users/me/watch-history/:ItemId",deleteUserHistoryItem)
+watchHistoryRoutes.delete("/users/:userId/watch-history/:ItemId", deleteHistoryItemById)
 
 
 export default watchHistoryRoutes;

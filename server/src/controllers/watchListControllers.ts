@@ -64,6 +64,7 @@ export const getUserWatchList = asyncHandler(
 
 export const getUserWatchItem = asyncHandler(
     async (req: any, res, next) => {
+        console.log("d")
         const wacthList = await prisma.watchlistItem.findUnique({
             where: {
                 userId: req.userId,
@@ -100,9 +101,10 @@ export const getWatchItemById = asyncHandler(
 
 export const addWatchListItem = asyncHandler(
     async (req: any, res, next) => {
+        const tmdbIdInt = parseInt(req.body.tmdbId, 10);
         const newItem = await prisma.watchlistItem.create({
             data: {
-                tmdbId: req.body.tmdbId,
+                tmdbId:tmdbIdInt ,
                 userId: req.userId,
             }
         })

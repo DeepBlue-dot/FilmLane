@@ -9,19 +9,20 @@ export const addWatchHistoryItemValidator = [
         .withMessage("tmdbId is required")
         .custom(
             async (value, { req }) => {
-            const existingItem = await prisma.watchlistItem.findUnique({
-                where: {
-                    userId_tmdbId: {
-                        userId: req.userId,
-                        tmdbId: value,
+                value = parseInt(value, 10);
+                const existingItem = await prisma.watchlistItem.findUnique({
+                    where: {
+                        userId_tmdbId: {
+                            userId: req.userId,
+                            tmdbId: value,
+                        },
                     },
-                },
-            })
+                })
 
-            if (existingItem) {
-                throw Error("Movie already in watchlist.")
-            }
-        }),
+                if (existingItem) {
+                    throw Error("Movie already in watchlist.")
+                }
+            }),
 
     validationRequest
 ]

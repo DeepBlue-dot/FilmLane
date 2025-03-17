@@ -5,13 +5,13 @@ import { addWatchListItemValidator } from "../middleware/validators/watchListVal
 
 const watchlistRoutes = Router()
 
-watchlistRoutes.get("/users/:userId/watchlist-Items", getWatchListByUserId)
 watchlistRoutes.get("/users/me/watchlist-Items", requireAuthentication, getUserWatchList)
+watchlistRoutes.get("/users/:userId/watchlist-Items", getWatchListByUserId)
 watchlistRoutes.post("/users/me/watchlist-Items", requireAuthentication, addWatchListItemValidator, addWatchListItem)
-watchlistRoutes.get("/users/:userId/watchlist-Items/:ItemId", getWatchItemById)
 watchlistRoutes.get("/users/me/watchlist-Items/:ItemId", requireAuthentication, getUserWatchItem)
-watchlistRoutes.delete("/users/:userId/watchlist-Items/:ItemId", deleteWatchItemById)
+watchlistRoutes.get("/users/:userId/watchlist-Items/:ItemId", getWatchItemById)
 watchlistRoutes.delete("/users/me/watchlist-Items/:ItemId", requireAuthentication, deleteUserWatchItem)
+watchlistRoutes.delete("/users/:userId/watchlist-Items/:ItemId", deleteWatchItemById)
 
 
 export default watchlistRoutes

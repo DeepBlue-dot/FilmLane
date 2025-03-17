@@ -57,6 +57,10 @@ export const parsePrismaQuery = (
                 select[field] = true;
             }
         });
+    } else {
+        options.allowedFields?.forEach((value) => {
+            select[value] = true
+        })
     }
 
     // 4. Filtering
