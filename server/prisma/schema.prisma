@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum MediaType {
+  MOVIE
+  SERIES
+  SEASON
+  EPISODE
+}
+
 model User {
   id            String          @id @default(uuid()) @db.Char(36)
   email         String          @unique(map: "email") @db.VarChar(255)
@@ -19,21 +26,23 @@ model User {
 }
 
 model WatchHistory {
-  id        String    @id @default(uuid()) @db.Char(36)
-  userId    String    @db.Char(36)
+  id        String     @id @default(uuid()) @db.Char(36)
+  userId    String     @db.Char(36)
   tmdbId    Int
-  watchedAt DateTime? @default(now()) @db.DateTime(0)
-  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaType MediaType
+  watchedAt DateTime?  @default(now()) @db.DateTime(0)
+  User      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "WatchHistory_userId_fkey")
 }
 
 model WatchlistItem {
-  id      String    @id @default(uuid()) @db.Char(36)
-  userId  String    @db.Char(36)
-  tmdbId  Int
-  addedAt DateTime? @default(now()) @db.DateTime(0)
-  User    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String     @id @default(uuid()) @db.Char(36)
+  userId    String     @db.Char(36)
+  tmdbId    Int
+  mediaType MediaType
+  addedAt   DateTime?  @default(now()) @db.DateTime(0)
+  User      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, tmdbId], map: "unique_watchlist")
+  @@unique([userId, tmdbId, mediaType], map: "unique_watchlist")
 }
