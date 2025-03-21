@@ -5,7 +5,7 @@ import { parsePrismaQuery } from "../services/queryParser.js";
 export const getWatchHistoryByUserId = asyncHandler(
     async (req, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId', 'watchedAt'],
+            allowedFields: ['id', 'tmdbId', 'MediaType','watchedAt'],
             dateFields: ['watchedAt'],
             defaultLimit: 25,
             maxLimit: 100,
@@ -35,7 +35,7 @@ export const getWatchHistoryByUserId = asyncHandler(
 export const getUserWatchHistory = asyncHandler(
     async (req: any, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId', 'watchedAt'],
+            allowedFields: ['id', 'tmdbId','MediaType', 'watchedAt'],
             dateFields: ['watchedAt'],
             defaultLimit: 25,
             maxLimit: 100,
@@ -101,10 +101,13 @@ export const getHistoryById = asyncHandler(
 export const addWatchHistoryItem = asyncHandler(
     async (req: any, res, next) => {
         const tmdbIdInt = parseInt(req.body.tmdbId, 10);
+        const mediaType = req.body.mediaType;
+
         const newItem = await prisma.watchHistory.create({
             data: {
                 tmdbId: tmdbIdInt,
                 userId: req.userId,
+                mediaType: mediaType
             }
         })
 
