@@ -1,128 +1,16 @@
 // tmdb.service.ts
 import axios, { AxiosInstance } from 'axios';
+import { DiscoverMoviesParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTVShowDetails, TMDBVideos } from './interfaces.js';
 
-// Type Definitions
-interface TMDBMovieDetails {
-    id: number;
-    title: string;
-    overview: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    release_date: string;
-    runtime: number;
-    genres: { id: number; name: string }[];
-    adult: boolean;
-    belongs_to_collection?: {
-        id: number;
-        name: string;
-        poster_path?: string;
-        backdrop_path?: string;
-    };
-    budget: number;
-    homepage?: string;
-    imdb_id?: string;
-    original_language: string;
-    original_title: string;
-    popularity: number;
-    production_companies: {
-        id: number;
-        name: string;
-        logo_path?: string;
-        origin_country: string;
-    }[];
-    production_countries: {
-        iso_3166_1: string;
-        name: string;
-    }[];
-    revenue: number;
-    spoken_languages: {
-        iso_639_1: string;
-        name: string;
-    }[];
-    status: string;
-    tagline?: string;
-    video: boolean;
-    vote_average: number;
-    vote_count: number;
-}
-
-interface TMDBMovieCredits {
-    id: number;
-    cast: {
-        id: number;
-        name: string;
-        character: string;
-        profile_path?: string;
-    }[];
-    crew: {
-        id: number;
-        name: string;
-        job: string;
-        department: string;
-    }[];
-}
-
-interface TMDBRecommendations {
-    page: number;
-    results: TMDBMovieDetails[];
-    total_pages: number;
-    total_results: number;
-}
-
-interface TMDBMedia {
-    backdrops: {
-        file_path: string;
-        width: number;
-        height: number;
-    }[];
-    posters: {
-        file_path: string;
-        width: number;
-        height: number;
-    }[];
-}
-
-interface TMDBVideos {
-    id: number;
-    results: {
-        id: string;
-        key: string;
-        name: string;
-        site: string;
-        type: string;
-    }[];
-}
-
-interface TMDBTVShowDetails {
-    id: number;
-    name: string;
-    overview: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    first_air_date: string;
-    last_air_date: string;
-    number_of_episodes: number;
-    number_of_seasons: number;
-    genres: { id: number; name: string }[];
-}
-
-type PaginatedResponse<T> = {
-    page: number;
-    results: T[];
-    total_pages: number;
-    total_results: number;
-};
 
 class TMDBService {
     private apiKey: string;
     private baseUrl: string;
-    private language: string;
     private axiosInstance: AxiosInstance;
 
-    constructor() {
+    constructor(language?: string) {
         this.apiKey = process.env.TMDB_API_KEY || '';
         this.baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
-        this.language = process.env.TMDB_DEFAULT_LANGUAGE || 'en-US';
 
         if (!this.apiKey) {
             throw new Error('TMDB_API_KEY environment variable is required');
@@ -130,16 +18,33 @@ class TMDBService {
 
         this.axiosInstance = axios.create({
             baseURL: this.baseUrl,
+            headers: {
+                Authorization: `Bearer ${this.apiKey}`,
+            },
             params: {
-                api_key: this.apiKey,
-                language: this.language,
+                language
             },
         });
+
     }
 
     // Movie Endpoints
+    async getMoviesGenreList(): Promise<{genres:Genre[]}> {
+        try {
+            const response = await this.axiosInstance.get(`/genre/movie/list`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
 
-    async getMovieDetails(movieId: number, options?: { appendToResponse?: string }): Promise<TMDBMovieDetails> {
+    async getMoviesGenreName(id: number): Promise<Genre | null> {
+        const list = await this.getMoviesGenreList()
+        const genre = list.genres.find((g: Genre) => g.id === id);
+        return genre ? genre : null;
+    }
+
+    async getMovieDetails(movieId: number, options?: { appendToResponse?: any }): Promise<TMDBMovieDetails> {
         try {
             const response = await this.axiosInstance.get(`/movie/${movieId}`, {
                 params: {
@@ -152,7 +57,18 @@ class TMDBService {
         }
     }
 
-    async getMovieRecommendations(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieDetails>> {
+    async getSimilarMovies(movieId: number, page = 1, language = "en-US"): Promise<PaginatedResponse<TMDBMovieResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/movie/${movieId}/similar`, {
+                params: { page, language },
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getMovieRecommendations(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
             const response = await this.axiosInstance.get(`/movie/${movieId}/recommendations`, {
                 params: { page },
@@ -190,7 +106,41 @@ class TMDBService {
         }
     }
 
+    async discoverMovies(params: DiscoverMoviesParams): Promise<PaginatedResponse<TMDBMovieResult>> {
+        try {
+            const transformedParams: Record<string, any> = {};
+
+            // Transform camelCase params to API-expected format
+            for (const key in params) {
+                const mappedKey = paramMappings[key] || key;
+                transformedParams[mappedKey] = params[key as keyof DiscoverMoviesParams];
+            }
+
+            const response = await this.axiosInstance.get('/discover/movie', {
+                params: transformedParams
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
     // TV Show Endpoints
+
+    async getTVShowGenreList(): Promise<Genre[]> {
+        try {
+            const response = await this.axiosInstance.get(`/genre/tv/list`);
+            return response.data.genres;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTVShowGenreName(id: number): Promise<string | null> {
+        const list = await this.getTVShowGenreList()
+        const genre = list.find((g: Genre) => g.id === id);
+        return genre ? genre.name : null;
+    }
 
     async getTVShowDetails(tvId: number): Promise<TMDBTVShowDetails> {
         try {
@@ -230,30 +180,6 @@ class TMDBService {
             const response = await this.axiosInstance.get('/tv/top_rated', {
                 params: { page },
             });
-            return response.data;
-        } catch (error) {
-            this.handleError(error);
-        }
-    }
-
-    // Shared Methods
-
-    async searchMovies(query: string, page = 1): Promise<PaginatedResponse<TMDBMovieDetails>> {
-        if (!query) throw new Error('Search query is required');
-
-        try {
-            const response = await this.axiosInstance.get('/search/movie', {
-                params: { query, page },
-            });
-            return response.data;
-        } catch (error) {
-            this.handleError(error);
-        }
-    }
-
-    async getGenres(): Promise<{ genres: { id: number; name: string }[] }> {
-        try {
-            const response = await this.axiosInstance.get('/genre/movie/list');
             return response.data;
         } catch (error) {
             this.handleError(error);
