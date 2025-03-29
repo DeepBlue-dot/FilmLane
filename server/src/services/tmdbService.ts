@@ -57,10 +57,10 @@ class TMDBService {
         }
     }
 
-    async getSimilarMovies(movieId: number, page = 1, language = "en-US"): Promise<PaginatedResponse<TMDBMovieResult>> {
+    async getSimilarMovies(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
             const response = await this.axiosInstance.get(`/movie/${movieId}/similar`, {
-                params: { page, language },
+                params: { page },
             });
             return response.data;
         } catch (error) {
