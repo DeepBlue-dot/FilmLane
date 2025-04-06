@@ -1,0 +1,3 @@
+finsh tmdbservies class
+create all the needed movie routes and contllors
+make the front end
