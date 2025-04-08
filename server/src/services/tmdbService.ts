@@ -1,6 +1,7 @@
 // tmdb.service.ts
 import axios, { AxiosInstance } from 'axios';
-import { DiscoverMoviesParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTVShowDetails, TMDBVideos } from './interfaces.js';
+import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails } from './interfaces.js';
+
 
 
 class TMDBService {
@@ -8,7 +9,7 @@ class TMDBService {
     private baseUrl: string;
     private axiosInstance: AxiosInstance;
 
-    constructor(language?: string) {
+    constructor(language = "en-US", include_adult = false) {
         this.apiKey = process.env.TMDB_API_KEY || '';
         this.baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
 
@@ -22,14 +23,15 @@ class TMDBService {
                 Authorization: `Bearer ${this.apiKey}`,
             },
             params: {
-                language
+                language,
+                include_adult
             },
         });
 
     }
 
     // Movie Endpoints
-    async getMoviesGenreList(): Promise<{genres:Genre[]}> {
+    async getMoviesGenreList(): Promise<{ genres: Genre[] }> {
         try {
             const response = await this.axiosInstance.get(`/genre/movie/list`);
             return response.data;
@@ -125,6 +127,36 @@ class TMDBService {
         }
     }
 
+    async searchMovie(query: string, options?: { page: 1, primary_release_year?: string, region?: string, year?: string }): Promise<PaginatedResponse<TMDBMovieResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/search/movie?query=${query}`, { params: { ...options } })
+            return response.data
+
+        } catch (error) {
+            this.handleError(error)
+        }
+    }
+
+
+    async searchBoth(query: string, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/search/multi?query=${query}`, { params: { page } })
+            return response.data
+
+        } catch (error) {
+            this.handleError(error)
+        }
+    }
+
+    async searchTVShows(query: string, options?: { page: 1, first_air_date_year?: string, year?: string }): Promise<PaginatedResponse<TMDBTVShowResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/search/tv?query=${query}`, { params: { ...options } })
+            return response.data
+
+        } catch (error) {
+            this.handleError(error)
+        }
+    }
     // TV Show Endpoints
 
     async getTVShowGenreList(): Promise<Genre[]> {
@@ -142,21 +174,12 @@ class TMDBService {
         return genre ? genre.name : null;
     }
 
-    async getTVShowDetails(tvId: number): Promise<TMDBTVShowDetails> {
+    async getTVShowDetails(tvId: number, options?: { appendToResponse?: any }): Promise<TMDBTVShowDetails> {
         try {
-            const response = await this.axiosInstance.get(`/tv/${tvId}`);
-            return response.data;
-        } catch (error) {
-            this.handleError(error);
-        }
-    }
-
-    async searchTVShows(query: string, page = 1): Promise<PaginatedResponse<TMDBTVShowDetails>> {
-        if (!query) throw new Error('Search query is required');
-
-        try {
-            const response = await this.axiosInstance.get('/search/tv', {
-                params: { query, page },
+            const response = await this.axiosInstance.get(`/tv/${tvId}`, {
+                params: {
+                    appendToResponse: options?.appendToResponse
+                }
             });
             return response.data;
         } catch (error) {
@@ -164,7 +187,7 @@ class TMDBService {
         }
     }
 
-    async getPopularTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowDetails>> {
+    async getPopularTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             const response = await this.axiosInstance.get('/tv/popular', {
                 params: { page },
@@ -175,7 +198,7 @@ class TMDBService {
         }
     }
 
-    async getTopRatedTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowDetails>> {
+    async getTopRatedTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             const response = await this.axiosInstance.get('/tv/top_rated', {
                 params: { page },
@@ -185,6 +208,72 @@ class TMDBService {
             this.handleError(error);
         }
     }
+
+    async getTvShowsAggregateCredits(series_id: number): Promise<TMDBTvShowCredits> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${series_id}/aggregate_credits`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTvShowsCredits(series_id: number): Promise<TMDBTvShowCredits> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${series_id}/credits`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async discoverTvShows(params: DiscoverTvShowParams): Promise<PaginatedResponse<TMDBTVShowResult>> {
+        try {
+            const transformedParams: Record<string, any> = {};
+
+            // Map the parameters from camelCase to the API-expected keys
+            for (const key in params) {
+                const mappedKey = paramMappingsTv[key] || key;
+                transformedParams[mappedKey] = params[key as keyof DiscoverTvShowParams];
+            }
+
+            // Make the request to the /discover/tv endpoint with the transformed parameters.
+            const response = await this.axiosInstance.get('/discover/tv', {
+                params: transformedParams,
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTVSeasonsDetails(series_id: number, season_number: number, options?: { appendToResponse?: any }): Promise<TvSeasonDetails> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}`, {
+                params: {
+                    appendToResponse: options?.appendToResponse
+                }
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTVEpisodesDetails(series_id: number, season_number: number, episode_number:number,options?: { appendToResponse?: any }): Promise<TvEpisodeDetails> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}/episode/${episode_number}`, {
+                params: {
+                    appendToResponse: options?.appendToResponse
+                }
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+
 
     private handleError(error: any): never {
         if (axios.isAxiosError(error)) {

@@ -64,12 +64,6 @@ export interface TMDBExternalIDs {
     twitter_id: string;
 }
 
-export interface TMDBMovieCredits {
-    id?: number; // Defaults to 0
-    cast: CastMember[];
-    crew: CrewMember[];
-}
-
 export interface TMDBMovieResult {
     adult: boolean;
     backdrop_path: string | null;
@@ -85,16 +79,70 @@ export interface TMDBMovieResult {
     video: boolean;
     vote_average: number;
     vote_count: number;
+    media_type?: string
 }
+
+export interface TvSeasonDetails {
+    _id: string;
+    air_date: string;
+    episodes: Episode[];
+    crew: CrewMember[];
+    guest_stars: GuestStar[];
+}
+
+export interface CrewMember {
+    department: string;
+    job: string;
+    credit_id: string;
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+}
+
+export interface GuestStar {
+    character: string;
+    credit_id: string;
+    order: number; // Defaults to 0
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+}
+
+export interface TMDBTVShowResult {
+    backdrop_path: string;
+    first_air_date: string;
+    genre_ids: number[];
+    id: number; // Defaults to 0
+    name: string;
+    origin_country: string[];
+    original_language: string;
+    original_name: string;
+    overview: string;
+    popularity: number; // Defaults to 0
+    poster_path: string;
+    vote_average: number; // Defaults to 0
+    vote_count: number; // Defaults to 0
+}
+
 
 
 export interface TMDBMovieCredits {
     id?: number; // Defaults to 0
-    cast: CastMember[];
-    crew: CrewMember[];
+    cast: MovieCastMember[];
+    crew: MovieCrewMember[];
 }
 
-export interface CastMember {
+export interface MovieCastMember {
     adult: boolean; // Defaults to true
     gender: number; // Defaults to 0
     id: number; // Defaults to 0
@@ -109,7 +157,7 @@ export interface CastMember {
     order: number; // Defaults to 0
 }
 
-export interface CrewMember {
+export interface MovieCrewMember {
     adult: boolean; // Defaults to true
     gender: number; // Defaults to 0
     id: number; // Defaults to 0
@@ -122,6 +170,57 @@ export interface CrewMember {
     department: string;
     job: string;
 }
+
+export interface TMDBTvShowCredits {
+    cast: TvShowCastMember[];
+    crew: TvShowCrewMember[];
+}
+
+// Interface for cast members
+export interface TvShowCastMember {
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+    roles: Role[];
+}
+
+// Interface for roles in the cast array
+export interface Role {
+    credit_id: string;
+    character: string;
+    episode_count: number; // Defaults to 0
+    total_episode_count: number; // Defaults to 0
+    order: number; // Defaults to 0
+}
+
+// Interface for crew members
+export interface TvShowCrewMember {
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+    jobs: Job[];
+}
+
+// Interface for jobs in the crew array
+export interface Job {
+    credit_id: string;
+    job: string;
+    episode_count: number; // Defaults to 0
+    department: string;
+    total_episode_count: number; // Defaults to 0
+    id: number; // Defaults to 0
+}
+
 
 export interface TMDBMedia {
     backdrops: ImageItem[];
@@ -156,18 +255,153 @@ export interface TMDBVideos {
     }[];
 }
 
+// Main interface representing a TV show (or similar media)
 export interface TMDBTVShowDetails {
-    id: number;
+    adult: boolean; // Defaults to true
+    backdrop_path: string;
+    created_by: CreatedBy[];
+    episode_run_time: number[];
+    first_air_date: string;
+    genres: Genre[];
+    homepage: string;
+    id: number; // Defaults to 0
+    in_production: boolean; // Defaults to true
+    languages: string[];
+    last_air_date: string;
+    last_episode_to_air: Episode;
+    next_episode_to_air: string;
+    networks: Network[];
+    number_of_episodes: number; // Defaults to 0
+    number_of_seasons: number; // Defaults to 0
+    origin_country: string[];
+    original_language: string;
+    original_name: string;
+    overview: string;
+    popularity: number; // Defaults to 0
+    poster_path: string;
+    production_companies: ProductionCompany[];
+    production_countries: ProductionCountry[];
+    seasons: Season[];
+    spoken_languages: SpokenLanguage[];
+    status: string;
+    tagline: string;
+    type: string;
+    vote_average: number; // Defaults to 0
+    vote_count: number; // Defaults to 0
+    aggregate_credits?: TMDBTvShowCredits
+}
+
+// Sub-interface for a "created_by" object
+export interface CreatedBy {
+    id: number; // Defaults to 0
+    credit_id: string;
+    name: string;
+    gender: number; // Defaults to 0
+    profile_path: string;
+}
+
+// Sub-interface for an episode (e.g., last_episode_to_air)
+export interface Episode {
+    id: number; // Defaults to 0
     name: string;
     overview: string;
-    poster_path?: string;
-    backdrop_path?: string;
-    first_air_date: string;
-    last_air_date: string;
-    number_of_episodes: number;
-    number_of_seasons: number;
-    genres: { id: number; name: string }[];
+    vote_average: number; // Defaults to 0
+    vote_count: number; // Defaults to 0
+    air_date: string;
+    episode_number: number; // Defaults to 0
+    production_code: string;
+    runtime: number; // Defaults to 0
+    season_number: number; // Defaults to 0
+    show_id: number; // Defaults to 0
+    still_path: string;
 }
+
+// Sub-interface for a network
+export interface Network {
+    id: number; // Defaults to 0
+    logo_path: string;
+    name: string;
+    origin_country: string;
+}
+
+// Sub-interface for a production company
+export interface ProductionCompany {
+    id: number; // Defaults to 0
+    logo_path: string;
+    name: string;
+    origin_country: string;
+}
+
+// Sub-interface for a production country
+export interface ProductionCountry {
+    iso_3166_1: string;
+    name: string;
+}
+
+// Sub-interface for a season
+export interface Season {
+    air_date: string;
+    episode_count: number; // Defaults to 0
+    id: number; // Defaults to 0
+    name: string;
+    overview: string;
+    poster_path: string;
+    season_number: number; // Defaults to 0
+    vote_average: number; // Defaults to 0
+}
+
+// Sub-interface for a spoken language
+export interface SpokenLanguage {
+    english_name: string;
+    iso_639_1: string;
+    name: string;
+}
+
+export interface TvEpisodeDetails {
+    air_date: string;
+    crew: EpisodeCrewMember[];
+    guest_stars: EpisodeGuestStar[];
+    name: string;
+    overview: string;
+    id: number; // Defaults to 0
+    production_code: string;
+    runtime: number; // Defaults to 0
+    season_number: number; // Defaults to 0
+    still_path: string;
+    vote_average: number; // Defaults to 0
+    vote_count: number; // Defaults to 0
+}
+
+export interface EpisodeCrewMember {
+    department: string;
+    job: string;
+    credit_id: string;
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+    episode_number: number; // Defaults to 0
+}
+
+export interface EpisodeGuestStar {
+    character: string;
+    credit_id: string;
+    order: number; // Defaults to 0
+    adult: boolean; // Defaults to true
+    gender: number; // Defaults to 0
+    id: number; // Defaults to 0
+    known_for_department: string;
+    name: string;
+    original_name: string;
+    popularity: number; // Defaults to 0
+    profile_path: string;
+}
+
+
 
 export interface TMDBReleaseDate {
     id?: number; // Defaults to 0
@@ -278,4 +512,76 @@ export const paramMappings: Record<string, string> = {
     withoutWatchProviders: 'without_watch_providers',
 };
 
+export interface DiscoverTvShowParams {
+    air_date_gte?: string;
+    air_date_lte?: string;
+    first_air_date_year?: number;
+    first_air_date_gte?: string;
+    first_air_date_lte?: string;
+    include_adult?: boolean;
+    include_null_first_air_dates?: boolean;
+    language?: string;
+    page?: number;
+    screened_theatrically?: boolean;
+    sort_by?: string;
+    timezone?: string;
+    vote_average_gte?: number;
+    vote_average_lte?: number;
+    vote_count_gte?: number;
+    vote_count_lte?: number;
+    watch_region?: string;
+    with_companies?: string;
+    with_genres?: string;
+    with_keywords?: string;
+    with_networks?: string;
+    with_origin_country?: string;
+    with_original_language?: string;
+    with_runtime_gte?: number;
+    with_runtime_lte?: number;
+    with_status?: string;
+    with_watch_monetization_types?: string;
+    with_watch_providers?: string;
+    without_companies?: string;
+    without_genres?: string;
+    without_keywords?: string;
+    without_watch_providers?: string;
+    with_type?: string;
+}
+
+// Mapping from camelCase keys to API-specific parameter names
+export const paramMappingsTv: Record<string, string> = {
+    air_date_gte: 'air_date.gte',
+    air_date_lte: 'air_date.lte',
+    first_air_date_year: 'first_air_date_year',
+    first_air_date_gte: 'first_air_date.gte',
+    first_air_date_lte: 'first_air_date.lte',
+    include_adult: 'include_adult',
+    include_null_first_air_dates: 'include_null_first_air_dates',
+    language: 'language',
+    page: 'page',
+    screened_theatrically: 'screened_theatrically',
+    sort_by: 'sort_by',
+    timezone: 'timezone',
+    vote_average_gte: 'vote_average.gte',
+    vote_average_lte: 'vote_average.lte',
+    vote_count_gte: 'vote_count.gte',
+    vote_count_lte: 'vote_count.lte',
+    watch_region: 'watch_region',
+    with_companies: 'with_companies',
+    with_genres: 'with_genres',
+    with_keywords: 'with_keywords',
+    with_networks: 'with_networks',
+    with_origin_country: 'with_origin_country',
+    with_original_language: 'with_original_language',
+    with_runtime_gte: 'with_runtime.gte',
+    with_runtime_lte: 'with_runtime.lte',
+    with_status: 'with_status',
+    with_watch_monetization_types: 'with_watch_monetization_types',
+    with_watch_providers: 'with_watch_providers',
+    without_companies: 'without_companies',
+    without_genres: 'without_genres',
+    without_keywords: 'without_keywords',
+    without_watch_providers: 'without_watch_providers',
+    with_type: 'with_type',
+};
 
