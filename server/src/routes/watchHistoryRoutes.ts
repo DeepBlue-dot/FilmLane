@@ -5,7 +5,7 @@ import { addWatchHistoryItemValidator } from "../middleware/validators/watchHist
 
 const watchHistoryRoutes = Router();
 
-watchHistoryRoutes.get("/users/me/watch-history", requireAuthentication,getUserWatchHistory)
+watchHistoryRoutes.get("/users/me/watch-history", requireAuthentication, getUserWatchHistory)
 watchHistoryRoutes.get("/users/:userId/watch-history", getWatchHistoryByUserId)
 watchHistoryRoutes.post("/users/me/watch-history", requireAuthentication, addWatchHistoryItemValidator, addWatchHistoryItem)
 watchHistoryRoutes.get("/users/me/watch-history/:ItemId", getUserWatchHistory)

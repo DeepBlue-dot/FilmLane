@@ -178,7 +178,7 @@ class TMDBService {
         try {
             const response = await this.axiosInstance.get(`/tv/${tvId}`, {
                 params: {
-                    appendToResponse: options?.appendToResponse
+                    append_to_response: options?.appendToResponse
                 }
             });
             return response.data;
@@ -251,7 +251,7 @@ class TMDBService {
         try {
             const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}`, {
                 params: {
-                    appendToResponse: options?.appendToResponse
+                    append_to_response: options?.appendToResponse
                 }
             });
             return response.data;
@@ -264,7 +264,7 @@ class TMDBService {
         try {
             const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}/episode/${episode_number}`, {
                 params: {
-                    appendToResponse: options?.appendToResponse
+                    append_to_response: options?.appendToResponse
                 }
             });
             return response.data;

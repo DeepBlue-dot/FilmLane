@@ -288,7 +288,7 @@ export interface TMDBTVShowDetails {
     type: string;
     vote_average: number; // Defaults to 0
     vote_count: number; // Defaults to 0
-    aggregate_credits?: TMDBTvShowCredits
+    aggregate_credits?: TMDBTvShowCredits;
 }
 
 // Sub-interface for a "created_by" object
