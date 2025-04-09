@@ -590,3 +590,9 @@ export interface TMDBCountries {
     english_name: string
     native_name: string
 }
+
+export interface TMDBLanguages {
+    iso_639_1: string
+    english_name: string
+    name: string
+}

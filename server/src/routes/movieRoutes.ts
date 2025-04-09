@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { discoverMovies, discoverTvShows, getCountriesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows } from "../controllers/movieControllers.js";
+import { discoverMovies, discoverTvShows, getCountriesList, getLanguagesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows } from "../controllers/movieControllers.js";
 
 const movieRoutes: Router= Router()
 
@@ -17,6 +17,6 @@ movieRoutes.get("/search/movie", searchMovie)
 movieRoutes.get("/search/tv", searchTVShows)
 movieRoutes.get("/search/multi", searchAll)
 movieRoutes.get("/countries", getCountriesList)
-
+movieRoutes.get("/Languages", getLanguagesList)
 
 export default movieRoutes;
