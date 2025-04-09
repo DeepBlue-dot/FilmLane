@@ -1,6 +1,6 @@
 // tmdb.service.ts
 import axios, { AxiosInstance } from 'axios';
-import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails } from './interfaces.js';
+import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails, TMDBCountries } from './interfaces.js';
 
 
 
@@ -28,6 +28,15 @@ class TMDBService {
             },
         });
 
+    }
+
+    async getCountriesList(): Promise<TMDBCountries[]> {
+        try {
+            const response = await this.axiosInstance.get(`/configuration/countries`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
     }
 
     // Movie Endpoints

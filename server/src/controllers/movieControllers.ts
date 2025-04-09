@@ -133,3 +133,11 @@ export const searchTVShows = asyncHandler(
         res.status(200).json(tvResponse)
     }
 )
+
+export const getCountriesList = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService(`${req.query.language}`, Boolean(req.query.include_adult || false));
+        const tvResponse = await tmdb.getCountriesList();
+        res.status(200).json(tvResponse)
+    }
+)
