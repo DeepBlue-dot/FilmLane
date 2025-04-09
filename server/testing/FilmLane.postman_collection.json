@@ -1,0 +1,848 @@
+{
+	"info": {
+		"_postman_id": "63ae509f-5573-49f9-ac3f-85b8895b4a34",
+		"name": "FilmLane",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41967841"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "getUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/me",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/60bf1406-402a-4ebe-8a07-26b25a8dfa6",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"60bf1406-402a-4ebe-8a07-26b25a8dfa6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllusers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"username\":\"deepblue\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/me",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUserById",
+					"request": {
+						"method": "PUT",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUserById",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"yeabsira2@gmail.com\",\n    \"username\": \"yeab\",\n    \"password\": \"1q2w3e4r5t\",\n    \"confirmPassword\": \"1q2w3e4r5t\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/auth/register",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":  \"yeabsira12@gmail.com\",\n    \"password\": \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/auth/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "watchlist",
+			"item": [
+				{
+					"name": "getWatchListByUserId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/5e8c0b28-f27c-440d-b66a-d2339b9d24f3/watchlist-Items",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"5e8c0b28-f27c-440d-b66a-d2339b9d24f3",
+								"watchlist-Items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserWatchList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/me/watchlist-Items",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"watchlist-Items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addWatchListItem",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tmdbId\": 1408248\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/me/watchlist-Items",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"watchlist-Items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getWatchItemById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/5e8c0b28-f27c-440d-b66a-d2339b9d24f3/watchlist-Items/6c57397c-1016-407e-b897-f30c73c20ebb",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"5e8c0b28-f27c-440d-b66a-d2339b9d24f3",
+								"watchlist-Items",
+								"6c57397c-1016-407e-b897-f30c73c20ebb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getUserWatchItem",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/users/me/watchlist-Items/6c57397c-1016-407e-b897-f30c73c20ebb",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								"me",
+								"watchlist-Items",
+								"6c57397c-1016-407e-b897-f30c73c20ebb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUserWatchItem",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "deleteWatchItemById",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "watchHistory",
+			"item": [
+				{
+					"name": "getUserWatchHistory",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getWatchHistoryByUserId",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "addWatchHistoryItem",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getUserWatchHistory",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getHistoryById",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUserHistoryItem",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "deleteHistoryItemById",
+					"request": {
+						"method": "DELETE",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "movie",
+			"item": [
+				{
+					"name": "getMovieDetails",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/movie/278?appendToResponse=videos,images,lists",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"movie",
+								"278"
+							],
+							"query": [
+								{
+									"key": "appendToResponse",
+									"value": "videos,images,lists"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTvShowDetails",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/tv/1396?appendToResponse=videos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"tv",
+								"1396"
+							],
+							"query": [
+								{
+									"key": "appendToResponse",
+									"value": "videos"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTvSeasonDetails",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/tv/1396/season/2?appendToResponse=videos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"tv",
+								"1396",
+								"season",
+								"2"
+							],
+							"query": [
+								{
+									"key": "appendToResponse",
+									"value": "videos"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTvEpisodeDetails",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/tv/1396/season/2/episode/1?appendToResponse=videos",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"tv",
+								"1396",
+								"season",
+								"2",
+								"episode",
+								"1"
+							],
+							"query": [
+								{
+									"key": "appendToResponse",
+									"value": "videos"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMoviesGenreList",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/genre/movie/list",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"genre",
+								"movie",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMoviesGenreName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:3000/api/genre/movie/28",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"genre",
+								"movie",
+								"28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTvShowGenreList",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "getTvShowGenreName",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "searchAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/search/multi?query=matrix&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"search",
+								"multi"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "matrix"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "searchTVShows",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/search/tv?query=breaking+bad&page=1&first_air_date_year=2008",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"search",
+								"tv"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "breaking+bad"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "first_air_date_year",
+									"value": "2008"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "searchMovie",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/search/movie?query=batman&page=1&primary_release_year=2008&region=US",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"search",
+								"movie"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "batman"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "primary_release_year",
+									"value": "2008"
+								},
+								{
+									"key": "region",
+									"value": "US"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "discoverMovies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/discover/movie?includeAdult=true&page=1&sort_by=popularity.desc&primaryReleaseYear=2025&voteAverageGte=7\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"discover",
+								"movie"
+							],
+							"query": [
+								{
+									"key": "includeAdult",
+									"value": "true"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "sort_by",
+									"value": "popularity.desc"
+								},
+								{
+									"key": "primaryReleaseYear",
+									"value": "2025"
+								},
+								{
+									"key": "voteAverageGte",
+									"value": "7\n"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "discoverTvShows",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/discover/tv?include_adult=false&language=en-US&page=2&sort_by=popularity.desc&first_air_date_year=2023&voteAverageGte=8\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"discover",
+								"tv"
+							],
+							"query": [
+								{
+									"key": "include_adult",
+									"value": "false"
+								},
+								{
+									"key": "language",
+									"value": "en-US"
+								},
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "sort_by",
+									"value": "popularity.desc"
+								},
+								{
+									"key": "first_air_date_year",
+									"value": "2023"
+								},
+								{
+									"key": "voteAverageGte",
+									"value": "8\n"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
