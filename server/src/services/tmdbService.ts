@@ -127,9 +127,9 @@ class TMDBService {
         }
     }
 
-    async searchMovie(query: string, options?: { page: 1, primary_release_year?: string, region?: string, year?: string }): Promise<PaginatedResponse<TMDBMovieResult>> {
+    async searchMovie(options: { query: string, page: number, primary_release_year?: string, region?: string, year?: string }): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/movie?query=${query}`, { params: { ...options } })
+            const response = await this.axiosInstance.get(`/search/movie`, { params: { ...options } })
             return response.data
 
         } catch (error) {
@@ -138,9 +138,9 @@ class TMDBService {
     }
 
 
-    async searchBoth(query: string, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
+    async searchAll(options: { query: string, page: number }): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/multi?query=${query}`, { params: { page } })
+            const response = await this.axiosInstance.get(`/search/multi`, { params: { ...options } })
             return response.data
 
         } catch (error) {
@@ -148,9 +148,9 @@ class TMDBService {
         }
     }
 
-    async searchTVShows(query: string, options?: { page: 1, first_air_date_year?: string, year?: string }): Promise<PaginatedResponse<TMDBTVShowResult>> {
+    async searchTVShows(options: { query: string, page: number, first_air_date_year?: string, year?: string }): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/tv?query=${query}`, { params: { ...options } })
+            const response = await this.axiosInstance.get(`/search/tv`, { params: { ...options } })
             return response.data
 
         } catch (error) {
@@ -260,7 +260,7 @@ class TMDBService {
         }
     }
 
-    async getTVEpisodesDetails(series_id: number, season_number: number, episode_number:number,options?: { appendToResponse?: any }): Promise<TvEpisodeDetails> {
+    async getTVEpisodesDetails(series_id: number, season_number: number, episode_number: number, options?: { appendToResponse?: any }): Promise<TvEpisodeDetails> {
         try {
             const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}/episode/${episode_number}`, {
                 params: {
