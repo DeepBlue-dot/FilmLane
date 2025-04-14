@@ -41,7 +41,7 @@ class TMDBService {
 
     async getLanguagesList(): Promise<TMDBLanguages[]> {
         try {
-            const response = await this.axiosInstance.get(`/configuration/countries`);
+            const response = await this.axiosInstance.get(`/configuration/languages`);
             return response.data;
         } catch (error) {
             this.handleError(error);
