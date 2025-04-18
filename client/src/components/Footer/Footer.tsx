@@ -41,12 +41,17 @@ export default function Footer() {
                     to="/trending"
                     className="hover:underline cursor-pointer"
                   >
-                    Trending
+                    Top Rated
                   </Link>
                 </li>
                 <li>
                   <Link to="/actors" className="hover:underline cursor-pointer">
                     Popular
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/actors" className="hover:underline cursor-pointer">
+                    Upcoming
                   </Link>
                 </li>
               </ul>
@@ -71,7 +76,7 @@ export default function Footer() {
                     to="/collections"
                     className="hover:underline cursor-pointer"
                   >
-                    Trending
+                    Top Rated
                   </Link>
                 </li>
                 <li>
