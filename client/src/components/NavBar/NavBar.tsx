@@ -2,23 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDoubleDropdownOpen, setIsDoubleDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const toggleDoubleDropdown = (e: { stopPropagation: () => void }) => {
-    e.stopPropagation();
-    setIsDoubleDropdownOpen(!isDoubleDropdownOpen);
-  };
-
-  const toggleUserDropdown = () => {
-    setIsUserDropdownOpen(!isUserDropdownOpen);
-  };
+  const [isGenreDropdownOpen, setIsGenreDropdownOpen] = useState(false);
+  const [isNestedDropdownOpen, setIsNestedDropdownOpen] = useState(false);
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -56,7 +43,6 @@ export default function Navbar() {
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
-              <span className="sr-only">Search icon</span>
             </div>
             <input
               type="text"
@@ -67,12 +53,11 @@ export default function Navbar() {
           </div>
 
           {/* User dropdown */}
-          <div className="relative">
+          <div className="relative ml-3">
             <button
               type="button"
-              onClick={toggleUserDropdown}
               className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              aria-expanded={isUserDropdownOpen}
+              onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
             >
               <span className="sr-only">Open user menu</span>
               <img
@@ -81,159 +66,115 @@ export default function Navbar() {
                 alt="user photo"
               />
             </button>
-            {/* User dropdown menu */}
-            <div
-              className={`z-50 ${
-                isUserDropdownOpen ? "block" : "hidden"
-              } absolute right-0 mt-2 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600`}
-            >
-              <div className="px-4 py-3">
-                <span className="block text-sm text-gray-900 dark:text-white">
-                  Bonnie Green
-                </span>
-                <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                  name@flowbite.com
-                </span>
+            
+            {isUserDropdownOpen && (
+              <div className="z-50 absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700">
+                <div className="px-4 py-3">
+                  <span className="block text-sm text-gray-900 dark:text-white">
+                    Bonnie Green
+                  </span>
+                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                    name@flowbite.com
+                  </span>
+                </div>
+                <ul>
+                  <li>
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/settings"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                    >
+                      Settings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/earnings"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                    >
+                      Earnings
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/signout"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
+                    >
+                      Sign out
+                    </Link>
+                  </li>
+                </ul>
               </div>
-              <ul className="py-2" aria-labelledby="user-menu-button">
-                <li>
-                  <Link
-                    to="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/settings"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Settings
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/earnings"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Earnings
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/signout"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Sign out
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            )}
           </div>
-
-          {/* Mobile search toggle button */}
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 me-1"
-            aria-controls="navbar-search"
-            aria-expanded={isMenuOpen}
-          >
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-              />
-            </svg>
-            <span className="sr-only">Search</span>
-          </button>
 
           {/* Mobile menu toggle button */}
           <button
-            onClick={() => setIsMenuOpen((prev) => !prev)}
             type="button"
             className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-            aria-controls="navbar-search"
-            aria-expanded={isMenuOpen}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-5 h-5"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 17 14"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 1h15M1 7h15M1 13h15"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Menu items */}
-        <div
-          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${
-            isMenuOpen ? "" : "hidden"
-          }`}
-          id="navbar-search"
-        >
-          <div className="relative mt-3 md:hidden">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            {isMobileMenuOpen ? (
               <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                className="w-5 h-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
-                viewBox="0 0 20 20"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-5 h-5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 17 14"
               >
                 <path
                   stroke="currentColor"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  d="M1 1h15M1 7h15M1 13h15"
                 />
               </svg>
-            </div>
-            <input
-              type="text"
-              id="search-navbar-mobile"
-              className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Search..."
-            />
-          </div>
+            )}
+          </button>
+        </div>
 
+        {/* Desktop menu items */}
+        <div className="hidden md:flex items-center justify-between w-full md:w-auto md:order-1">
           <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
               <Link
-                to="/"
-                className="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
+                to="/home"
+                className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500"
                 aria-current="page"
               >
                 Home
               </Link>
             </li>
 
-            {/* Dropdown menu item */}
-            <li className="relative">
+            <li className="relative group">
               <button
-                onClick={toggleDropdown}
-                className="flex items-center justify-between w-full py-2 px-3 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:w-auto dark:text-white md:dark:hover:text-blue-500 dark:focus:text-white dark:hover:bg-gray-700 md:dark:hover:bg-transparent"
+                className="flex items-center justify-between px-3 py-2 text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500"
+                onClick={() => setIsGenreDropdownOpen(!isGenreDropdownOpen)}
               >
                 Genre
                 <svg
@@ -253,126 +194,119 @@ export default function Navbar() {
                 </svg>
               </button>
 
-              {/* Dropdown menu */}
-              <div
-                className={`z-10 ${
-                  isDropdownOpen ? "block" : "hidden"
-                } absolute font-normal bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700 dark:divide-gray-600`}
-              >
-                <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                  <li>
-                    <Link
-                      to="/dashboard"
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li className="relative">
-                    <button
-                      onClick={toggleDoubleDropdown}
-                      className="flex items-center justify-between w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Dropdown
-                      <svg
-                        className="w-2.5 h-2.5 ms-2.5"
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 10 6"
+              {isGenreDropdownOpen && (
+                <div className="absolute z-10 font-normal bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
+                  <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                    <li>
+                      <Link
+                        to="/dashboard"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
                       >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="m1 1 4 4 4-4"
-                        />
-                      </svg>
-                    </button>
-
-                    {/* Second level dropdown */}
-                    <div
-                      className={`z-10 ${
-                        isDoubleDropdownOpen ? "block" : "hidden"
-                      } absolute top-0 left-full bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}
-                    >
-                      <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-                        <li>
-                          <Link
-                            to="/overview"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                          >
-                            Overview
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/downloads"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                          >
-                            My downloads
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/billing"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                          >
-                            Billing
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/rewards"
-                            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                          >
-                            Rewards
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li>
+                        Dashboard
+                      </Link>
+                    </li>
+                    <li className="relative">
+                      <button
+                        className="flex justify-between items-center w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsNestedDropdownOpen(!isNestedDropdownOpen)}
+                      >
+                        Dropdown
+                        <svg
+                          className="w-2.5 h-2.5 ms-2.5"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 10 6"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="m1 1 4 4 4-4"
+                          />
+                        </svg>
+                      </button>
+                      {isNestedDropdownOpen && (
+                        <div className="absolute left-full top-0 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                          <ul className="py-2 text-sm">
+                            <li>
+                              <Link
+                                to="/overview"
+                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                              >
+                                Overview
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/downloads"
+                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                              >
+                                My downloads
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/billing"
+                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                              >
+                                Billing
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="/rewards"
+                                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                              >
+                                Rewards
+                              </Link>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </li>
+                    <li>
+                      <Link
+                        to="/earnings"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      >
+                        Earnings
+                      </Link>
+                    </li>
+                  </ul>
+                  <div className="py-1">
                     <Link
-                      to="/earnings"
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                      to="/signout"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200"
                     >
-                      Earnings
+                      Sign out
                     </Link>
-                  </li>
-                </ul>
-                <div className="py-1">
-                  <Link
-                    to="/signout"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Sign out
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              )}
             </li>
 
             <li>
               <Link
                 to="/countries"
-                className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >
-                countries
+                Countries
               </Link>
             </li>
             <li>
               <Link
                 to="/movies"
-                className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >
-                movies
+                Movies
               </Link>
             </li>
             <li>
               <Link
                 to="/tv"
-                className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >
                 TV Shows
               </Link>
@@ -380,9 +314,88 @@ export default function Navbar() {
             <li>
               <Link
                 to="/topIMDB"
-                className="block py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
               >
                 Top IMDB
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        {/* Mobile menu */}
+        <div className={`md:hidden w-full mt-4 ${isMobileMenuOpen ? 'block' : 'hidden'}`}>
+          <div className="relative">
+            <input
+              type="text"
+              className="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Search..."
+            />
+          </div>
+
+          <ul className="flex flex-col p-4 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
+            <li>
+              <Link
+                to="/"
+                className="block py-2 px-3 text-white bg-blue-700 rounded"
+                aria-current="page"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/dashboard"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Dashboard
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/countries"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Countries
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/movies"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Movies
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/tv"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                TV Shows
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/topIMDB"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Top IMDB
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/settings"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Settings
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/signout"
+                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              >
+                Sign out
               </Link>
             </li>
           </ul>
