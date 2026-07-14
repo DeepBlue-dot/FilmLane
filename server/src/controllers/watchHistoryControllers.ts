@@ -84,8 +84,8 @@ export const getHistoryById = asyncHandler(
     async (req, res, next) => {
         const watchHistory = await prisma.watchHistory.findUnique({
             where: {
-                userId: req.params.userId,
-                id: req.params.ItemId
+                userId: req.params.userId as string,
+                id: req.params.ItemId as string
             }
         })
 
@@ -155,8 +155,8 @@ export const deleteHistoryItemById = asyncHandler(
     async (req, res, next) => {
         const watchHistory = await prisma.watchHistory.delete({
             where: {
-                userId: req.params.userId,
-                id: req.params.ItemId
+                userId: req.params.userId as string,
+                id: req.params.ItemId as string
             }
         })
 

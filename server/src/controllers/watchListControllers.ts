@@ -85,8 +85,8 @@ export const getWatchItemById = asyncHandler(
     async (req, res, next) => {
         const wacthList = await prisma.watchlistItem.findUnique({
             where: {
-                userId: req.params.userId,
-                id: req.params.ItemId
+                userId: req.params.userId as string,
+                id: req.params.ItemId as string
             }
         })
 
@@ -141,8 +141,8 @@ export const deleteWatchItemById = asyncHandler(
     async (req, res, next) => {
         const wacthList = await prisma.watchlistItem.delete({
             where: {
-                userId: req.params.userId,
-                id: req.params.ItemId
+                userId: req.params.userId as string,
+                id: req.params.ItemId as string
             }
         })
 

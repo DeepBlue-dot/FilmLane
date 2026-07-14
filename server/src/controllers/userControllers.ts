@@ -36,7 +36,7 @@ export const getUserById = asyncHandler(
         const user = await prisma.user.findUnique(
             {
                 where: {
-                    id: req.params.id
+                    id: req.params.id as string
                 },
                 select: {
                     id: true,
@@ -158,7 +158,7 @@ export const deleteUserById = asyncHandler(
     async (req, res, next) => {
         const user = await prisma.user.delete({
             where: {
-                id: req.params.id
+                id: req.params.id as string
             }
         })
 

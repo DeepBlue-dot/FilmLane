@@ -1,5 +1,6 @@
 import request from 'supertest';
 
+jest.mock('../../src/config/db.js', () => ({ }));
 // Mock axios before importing the app so TMDBService uses the mocked axios
 jest.mock('axios', () => {
   return {
