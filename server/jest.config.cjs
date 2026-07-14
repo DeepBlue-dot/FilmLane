@@ -9,5 +9,12 @@ module.exports = {
   },
   setupFilesAfterEnv: ['./jest.setup.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.spec.ts']
+  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.spec.ts'],
+  // Map ESM-style .js imports in TS source to their TS counterparts for Jest
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', { useESM: true }],
+  }
 };

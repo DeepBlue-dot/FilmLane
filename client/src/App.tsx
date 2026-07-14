@@ -17,6 +17,7 @@ import MovieDetailsPage from "./pages/MovieDetails/MovieDetailsPage.js";
 import TvDetailsPage from "./pages/TvDetails/TvDetailsPage.js";
 import MoviePlayPage from "./pages/MoviePlay/MoviePlayPage.js";
 import TvEpisodePlayPage from "./pages/TvEpisodePlay/TvEpisodePlayPage.js";
+import UserProfilePage from "./pages/UserProfile/UserProfilePage.js";
 
 configure({ axios: api });
 
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="/tv" element={<TvDiscoveryPage />} />
               <Route path="/topIMDB" element={<TopIMDBPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/profile" element={<UserProfilePage />} />
 
               <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
               <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
