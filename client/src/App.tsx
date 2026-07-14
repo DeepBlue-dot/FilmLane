@@ -2,13 +2,17 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
 import Layout from "./components/Layout/Layout";
 import NotFound from "./pages/PageNotFound/PageNotFound";
-import HomePage from "./pages/Homepage/HomePage";
+import HomePage from "./pages/Homepage/HomePage.js";
 import { configure } from 'axios-hooks';
-import LoginPage from "./pages/LoginPage/LoginPage";
-import RegisterPage from "./pages/Register/Register";
+import LoginPage from "./pages/LoginPage/LoginPage.js";
+import RegisterPage from "./pages/Register/Register.js";
 import { api } from "./services/api.js";
 import { AuthProvider } from "./context/AuthContext.js";
 import { ProtectedRoute, PublicOnlyRoute } from "./components/Layout/ProtectedRoute.js";
+import SearchPage from "./pages/SearchPage/SearchPage.js";
+import MovieDiscoveryPage from "./pages/MovieDiscovery/MovieDiscoveryPage.js";
+import TvDiscoveryPage from "./pages/TvDiscovery/TvDiscoveryPage.js";
+import TopIMDBPage from "./pages/TopIMDB/TopIMDBPage.js";
 
 configure({ axios: api });
 
@@ -30,10 +34,10 @@ export default function App() {
               <Route path="/home" element={<HomePage />} />
               <Route path="/genre" />
               <Route path="/countries" />
-              <Route path="/movies" />
-              <Route path="/tv" />
-              <Route path="/topIMDB" />
-              <Route path="/search" />
+              <Route path="/movies" element={<MovieDiscoveryPage />} />
+              <Route path="/tv" element={<TvDiscoveryPage />} />
+              <Route path="/topIMDB" element={<TopIMDBPage />} />
+              <Route path="/search" element={<SearchPage />} />
 
               <Route path="/movies/:movieId" />
               <Route path="/movies/:movieId/play" />
