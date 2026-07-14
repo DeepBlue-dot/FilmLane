@@ -21,24 +21,20 @@ export const authenticateUser: RequestHandler = asyncHandler(
                 if (!user) {
                     res.cookie("jwt", "loggedout", {
                         expires: new Date(Date.now()), // Expire immediately
+                        httpOnly: true,
                     });
 
-                    res.status(401).json({
-                        status: "failed",
-                        message: "User no longer exists"
-                    })
-
-                    return;
+                    return next();
                 }
                 (req as any).userId = user.id;
 
             } catch (error) {
-                res.status(401).json({
-                    status: "failed",
-                    message: "Invalid or expired token",
+                res.cookie("jwt", "loggedout", {
+                    expires: new Date(Date.now()), // Expire immediately
+                    httpOnly: true,
                 });
 
-                return
+                return next();
             }
         }
         next()

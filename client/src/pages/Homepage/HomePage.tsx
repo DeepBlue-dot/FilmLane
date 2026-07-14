@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { api } from '../../services/api.js';
 import { HeroSlider } from '../../components/features/HeroSlider.js';
 import { MediaCarousel } from '../../components/features/MediaCarousel.js';
@@ -31,8 +32,18 @@ export default function HomePage() {
         setPopularTvShows(tvRes.data?.results || []);
         setActionMovies(actionRes.data?.results || []);
         setComedyMovies(comedyRes.data?.results || []);
-      } catch (error) {
-        console.error('Error fetching homepage data:', error);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          console.log('========== AXIOS ERROR ==========');
+          console.log('code:', err.code);
+          console.log('message:', err.message);
+          console.log('status:', err.response?.status);
+          console.log('data:', err.response?.data);
+          console.log('config:', err.config);
+          console.log('request:', err.request);
+        } else {
+          console.error('Error fetching homepage data:', err);
+        }
       } finally {
         setLoading(false);
       }

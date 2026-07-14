@@ -5,7 +5,7 @@ import { parsePrismaQuery } from "../services/queryParser.js";
 export const getWatchListByUserId = asyncHandler(
     async (req, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId', 'MediaType','watchedAt'],
+            allowedFields: ['id', 'tmdbId', 'mediaType','addedAt'],
             dateFields: ['addedAt'],
             defaultLimit: 25,
             maxLimit: 100,
@@ -35,7 +35,7 @@ export const getWatchListByUserId = asyncHandler(
 export const getUserWatchList = asyncHandler(
     async (req: any, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId','MediaType', 'watchedAt'],
+            allowedFields: ['id', 'tmdbId','mediaType', 'addedAt'],
             dateFields: ['addedAt'],
             defaultLimit: 25,
             maxLimit: 100,

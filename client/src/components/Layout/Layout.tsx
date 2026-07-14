@@ -9,7 +9,7 @@ export default function Layout() {
       <NavBar />
 
       {/* Main content area expands to fill available space */}
-      <main className="flex-grow container ">
+      <main className="flex-grow container w-full mx-auto">
         <Outlet />
       </main>
 
