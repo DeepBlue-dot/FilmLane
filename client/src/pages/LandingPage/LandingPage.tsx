@@ -11,10 +11,7 @@ export default function LandingPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      // Unauthenticated users search triggers a redirect to login
-      navigate(`/login?query=${encodeURIComponent(query.trim())}`);
-    } else {
-      navigate('/login');
+      navigate(`/search?query=${encodeURIComponent(query.trim())}`);
     }
   };
 

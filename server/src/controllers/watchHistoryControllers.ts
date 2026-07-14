@@ -136,6 +136,21 @@ export const deleteUserHistoryItem = asyncHandler(
     }
 )
 
+export const clearUserWatchHistory = asyncHandler(
+    async (req: any, res, next) => {
+        await prisma.watchHistory.deleteMany({
+            where: {
+                userId: req.userId
+            }
+        })
+
+        res.status(200).json({
+            status: "success",
+            data: null,
+        })
+    }
+)
+
 export const deleteHistoryItemById = asyncHandler(
     async (req, res, next) => {
         const watchHistory = await prisma.watchHistory.delete({

@@ -33,22 +33,23 @@ export default function App() {
             <Route path="/register" element={<RegisterPage />} />
           </Route>
 
-          {/* Protected routes (authenticated users only) */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/genre" />
-              <Route path="/countries" />
-              <Route path="/movies" element={<MovieDiscoveryPage />} />
-              <Route path="/tv" element={<TvDiscoveryPage />} />
-              <Route path="/topIMDB" element={<TopIMDBPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/profile" element={<UserProfilePage />} />
+          {/* Mixed routes: Layout is rendered for guests and members */}
+          <Route element={<Layout />}>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/genre" />
+            <Route path="/countries" />
+            <Route path="/movies" element={<MovieDiscoveryPage />} />
+            <Route path="/tv" element={<TvDiscoveryPage />} />
+            <Route path="/topIMDB" element={<TopIMDBPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+            <Route path="/tv/:tvId" element={<TvDetailsPage />} />
+            <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
 
-              <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+            {/* Protected routes under Layout (authenticated users only) */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
-              <Route path="/tv/:tvId" element={<TvDetailsPage />} />
-              <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
               <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
             </Route>
           </Route>

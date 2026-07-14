@@ -2,10 +2,38 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.js';
-import { useWatchlist } from '../../hooks/useWatchlist.js';
+import { useWatchlist, WatchlistItem } from '../../hooks/useWatchlist.js';
 import { MediaCard } from '../../components/features/MediaCard.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { RiUser3Line, RiHeartLine, RiHistoryLine, RiSettings4Line, RiLockPasswordLine, RiDeleteBin5Line, RiTimeLine } from 'react-icons/ri';
+
+interface WatchlistDetailedItem extends WatchlistItem {
+  media: {
+    id: number;
+    title?: string;
+    name?: string;
+    poster_path?: string | null;
+    backdrop_path?: string | null;
+    vote_average?: number;
+    release_date?: string;
+    first_air_date?: string;
+  };
+}
+
+interface HistoryItem {
+  id: string;
+  userId: string;
+  tmdbId: number;
+  mediaType: 'MOVIE' | 'SERIES' | 'SEASON' | 'EPISODE';
+  watchedAt: string;
+  media: {
+    id?: number;
+    title?: string;
+    name?: string;
+    vote_average?: number;
+    backdrop_path?: string | null;
+  };
+}
 
 export default function UserProfilePage() {
   const { user, checkAuthStatus } = useAuth();
@@ -26,11 +54,11 @@ export default function UserProfilePage() {
   const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Watchlist detailed items state
-  const [watchlistItems, setWatchlistItems] = useState<any[]>([]);
+  const [watchlistItems, setWatchlistItems] = useState<WatchlistDetailedItem[]>([]);
   const [watchlistItemsLoading, setWatchlistItemsLoading] = useState(false);
 
   // History state
-  const [historyList, setHistoryList] = useState<any[]>([]);
+  const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
   // Sync username on user mount
@@ -62,14 +90,14 @@ export default function UserProfilePage() {
             return {
               ...item,
               media,
-            };
+            } as WatchlistDetailedItem;
           } catch (err) {
             console.error('Failed to load watchlist details for ID: ' + item.tmdbId, err);
             return null;
           }
         })
       );
-      setWatchlistItems(detailed.filter(Boolean));
+      setWatchlistItems(detailed.filter((item): item is WatchlistDetailedItem => item !== null));
     } catch (err) {
       console.error(err);
     } finally {
@@ -92,7 +120,7 @@ export default function UserProfilePage() {
       
       // Resolve TMDB details for each history record
       const resolved = await Promise.all(
-        items.map(async (item: any) => {
+        items.map(async (item: Omit<HistoryItem, 'media'>) => {
           const isMovie = item.mediaType === 'MOVIE';
           try {
             const endpoint = isMovie ? `/movie/${item.tmdbId}` : `/tv/${item.tmdbId}`;
@@ -101,7 +129,7 @@ export default function UserProfilePage() {
             return {
               ...item,
               media,
-            };
+            } as HistoryItem;
           } catch (err) {
             console.error('Failed to load history details for ID: ' + item.tmdbId, err);
             return {
@@ -111,7 +139,7 @@ export default function UserProfilePage() {
                 name: isMovie ? 'Unknown Movie' : 'Unknown TV Show',
                 vote_average: 0,
               },
-            };
+            } as HistoryItem;
           }
         })
       );
@@ -140,10 +168,11 @@ export default function UserProfilePage() {
       await api.put('/users/me', { username: username.trim() });
       setUsernameMsg({ type: 'success', text: 'Username updated successfully!' });
       await checkAuthStatus();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
       setUsernameMsg({
         type: 'error',
-        text: err.response?.data?.message || 'Failed to update username.',
+        text: axiosError.response?.data?.message || 'Failed to update username.',
       });
     } finally {
       setUsernameLoading(false);
@@ -179,10 +208,11 @@ export default function UserProfilePage() {
       setOldPassword('');
       setPassword('');
       setConfirmPassword('');
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
       setPasswordMsg({
         type: 'error',
-        text: err.response?.data?.message || 'Failed to change password.',
+        text: axiosError.response?.data?.message || 'Failed to change password.',
       });
     } finally {
       setPasswordLoading(false);
@@ -198,8 +228,21 @@ export default function UserProfilePage() {
     }
   };
 
+  const handleClearHistory = async () => {
+    if (!window.confirm('Are you sure you want to clear your entire watch history?')) return;
+    try {
+      await api.delete('/users/me/watch-history');
+      setHistoryList([]);
+    } catch (err) {
+      console.error('Failed to clear watch history', err);
+    }
+  };
+
   const handleBookmarkToggle = async (id: number, type: 'movie' | 'tv') => {
-    await toggleWatchlist(id, type);
+    const isAdded = await toggleWatchlist(id, type);
+    if (!isAdded) {
+      setWatchlistItems((prev) => prev.filter((item) => item.tmdbId !== id));
+    }
   };
 
   const formatDate = (dateStr?: string) => {
@@ -427,10 +470,21 @@ export default function UserProfilePage() {
           {/* TAB 3: WATCH HISTORY */}
           {activeTab === 'history' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2 border-b border-gray-900 pb-3">
-                <RiHistoryLine className="text-indigo-400 w-6 h-6" />
-                Watch History
-              </h3>
+              <div className="flex items-center justify-between border-b border-gray-900 pb-3">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <RiHistoryLine className="text-indigo-400 w-6 h-6" />
+                  Watch History
+                </h3>
+                {historyList.length > 0 && !historyLoading && (
+                  <button
+                    onClick={handleClearHistory}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-950/60 border border-red-900/30 hover:border-red-900/50 text-red-400 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+                  >
+                    <RiDeleteBin5Line className="w-3.5 h-3.5" />
+                    Clear All
+                  </button>
+                )}
+              </div>
 
               {historyLoading ? (
                 <div className="space-y-4">

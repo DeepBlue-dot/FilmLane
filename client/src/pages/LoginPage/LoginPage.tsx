@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
 import { Input } from '../../components/ui/input.js';
 import { Button } from '../../components/ui/button.js';
@@ -12,6 +12,7 @@ const LoginPage: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,10 +21,11 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      // PublicOnlyRoute guard will handle redirection, but let's proactively navigate to /home
-      navigate('/home');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Invalid email or password');
+      const from = (location.state as any)?.from || '/home';
+      navigate(from, { replace: true });
+    } catch (err: unknown) {
+      const axiosError = err as { message?: string };
+      setErrorMsg(axiosError.message || 'Invalid email or password');
     } finally {
       setSubmitting(false);
     }
