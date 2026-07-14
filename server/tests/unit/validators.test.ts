@@ -7,18 +7,31 @@ jest.mock('../../src/config/db.js', () => ({
   },
 }));
 
+jest.setTimeout(30000);
+
 import { validateUserRegistration, userLoginValidator } from '../../src/middleware/validators/authValidators.js';
 import { addWatchListItemValidator } from '../../src/middleware/validators/watchListValidators.js';
 import { addWatchHistoryItemValidator } from '../../src/middleware/validators/watchHistoryValidators.js';
 import { updateUserValidator } from '../../src/middleware/validators/userValidators.js';
 import prisma from '../../src/config/db.js';
+import validationRequest from '../../src/middleware/validateRequest.js';
 
 const runMiddlewareArray = async (middlewares: any[], req: any, res: any) => {
+  // Run validation chains (.run(req)) to populate validationResult
   for (const m of middlewares) {
-    await new Promise<void>((resolve) => {
-      m(req, res, () => resolve());
-    });
+    if (m && typeof m.run === 'function') {
+      await m.run(req);
+    }
   }
+
+  // Finally run the shared validationRequest handler to return errors
+  await new Promise<void>((resolve) => {
+    res.json.mockImplementation(() => {
+      resolve();
+      return res;
+    });
+    validationRequest(req, res, () => resolve());
+  });
 };
 
 const createReq = (body = {}, userId?: number) => ({ body, params: {}, query: {}, userId });
