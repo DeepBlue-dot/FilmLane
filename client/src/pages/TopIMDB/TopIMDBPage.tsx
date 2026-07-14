@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../services/api.js';
 import { MediaCard } from '../../components/features/MediaCard.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
