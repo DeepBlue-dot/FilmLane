@@ -13,6 +13,10 @@ import SearchPage from "./pages/SearchPage/SearchPage.js";
 import MovieDiscoveryPage from "./pages/MovieDiscovery/MovieDiscoveryPage.js";
 import TvDiscoveryPage from "./pages/TvDiscovery/TvDiscoveryPage.js";
 import TopIMDBPage from "./pages/TopIMDB/TopIMDBPage.js";
+import MovieDetailsPage from "./pages/MovieDetails/MovieDetailsPage.js";
+import TvDetailsPage from "./pages/TvDetails/TvDetailsPage.js";
+import MoviePlayPage from "./pages/MoviePlay/MoviePlayPage.js";
+import TvEpisodePlayPage from "./pages/TvEpisodePlay/TvEpisodePlayPage.js";
 
 configure({ axios: api });
 
@@ -39,11 +43,11 @@ export default function App() {
               <Route path="/topIMDB" element={<TopIMDBPage />} />
               <Route path="/search" element={<SearchPage />} />
 
-              <Route path="/movies/:movieId" />
-              <Route path="/movies/:movieId/play" />
-              <Route path="/tv/:tvId" />
-              <Route path="/tv/:tvId/season/:season_number" />
-              <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" />
+              <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+              <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
+              <Route path="/tv/:tvId" element={<TvDetailsPage />} />
+              <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
+              <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
             </Route>
           </Route>
 
