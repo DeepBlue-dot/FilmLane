@@ -1,6 +1,6 @@
 // tmdb.service.ts
 import axios, { AxiosInstance } from 'axios';
-import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails, TMDBCountries, TMDBLanguages } from './interfaces.js';
+import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails, TMDBCountries, TMDBLanguages, MultiSearchResult, TMDBPersonResult } from './interfaces.js';
 
 
 
@@ -8,26 +8,51 @@ class TMDBService {
     private apiKey: string;
     private baseUrl: string;
     private axiosInstance: AxiosInstance;
+    private authMode: 'bearer' | 'query';
 
-    constructor(language = "en-US", include_adult = false) {
-        this.apiKey = process.env.TMDB_API_KEY || '';
-        this.baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
+    constructor(options?: {
+        language?: string;
+        include_adult?: boolean;
+        apiKey?: string;
+        authMode?: 'bearer' | 'query';
+        axiosInstance?: AxiosInstance;
+        baseUrl?: string;
+    }) {
+        const language = options?.language ?? 'en-US';
+        const include_adult = options?.include_adult ?? false;
+        this.apiKey = options?.apiKey || process.env.TMDB_API_KEY || '';
+        this.baseUrl = options?.baseUrl || process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
+        this.authMode = options?.authMode || (process.env.TMDB_API_AUTH_MODE as any) || 'bearer';
 
         if (!this.apiKey) {
             throw new Error('TMDB_API_KEY environment variable is required');
         }
 
+        if (options?.axiosInstance) {
+            this.axiosInstance = options.axiosInstance;
+            return;
+        }
+
+        const defaultParams: Record<string, any> = {
+            language,
+            include_adult,
+        };
+
+        if (this.authMode === 'query') {
+            // use api_key as query param for v3 style access
+            defaultParams.api_key = this.apiKey;
+        }
+
+        const defaultHeaders: Record<string, string> = {};
+        if (this.authMode === 'bearer') {
+            defaultHeaders.Authorization = `Bearer ${this.apiKey}`;
+        }
+
         this.axiosInstance = axios.create({
             baseURL: this.baseUrl,
-            headers: {
-                Authorization: `Bearer ${this.apiKey}`,
-            },
-            params: {
-                language,
-                include_adult
-            },
+            headers: defaultHeaders,
+            params: defaultParams,
         });
-
     }
 
     async getCountriesList(): Promise<TMDBCountries[]> {
@@ -156,13 +181,22 @@ class TMDBService {
     }
 
 
-    async searchAll(options: { query: string, page: number }): Promise<PaginatedResponse<TMDBMovieResult>> {
+    async searchAll(options: { query: string, page: number }): Promise<PaginatedResponse<MultiSearchResult>> {
         try {
             const response = await this.axiosInstance.get(`/search/multi`, { params: { ...options } })
             return response.data
 
         } catch (error) {
             this.handleError(error)
+        }
+    }
+
+    async searchPerson(options: { query: string, page?: number }): Promise<PaginatedResponse<TMDBPersonResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/search/person`, { params: { ...options } });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
         }
     }
 
@@ -186,10 +220,10 @@ class TMDBService {
         }
     }
 
-    async getTVShowGenreName(id: number): Promise<string | null> {
-        const list = await this.getTVShowGenreList()
+    async getTVShowGenreName(id: number): Promise<Genre | null> {
+        const list = await this.getTVShowGenreList();
         const genre = list.find((g: Genre) => g.id === id);
-        return genre ? genre.name : null;
+        return genre ? genre : null;
     }
 
     async getTVShowDetails(tvId: number, options?: { appendToResponse?: any }): Promise<TMDBTVShowDetails> {
@@ -210,6 +244,33 @@ class TMDBService {
             const response = await this.axiosInstance.get('/tv/popular', {
                 params: { page },
             });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTVSimilar(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${tvId}/similar`, { params: { page } });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getTVRecommendations(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
+        try {
+            const response = await this.axiosInstance.get(`/tv/${tvId}/recommendations`, { params: { page } });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getPersonDetails(personId: number): Promise<TMDBPersonResult> {
+        try {
+            const response = await this.axiosInstance.get(`/person/${personId}`);
             return response.data;
         } catch (error) {
             this.handleError(error);

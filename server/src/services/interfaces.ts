@@ -82,8 +82,18 @@ export interface TMDBMovieResult {
     media_type?: string
 }
 
+export interface TMDBPersonResult {
+    id: number;
+    name: string;
+    profile_path: string | null;
+    known_for?: Array<TMDBMovieResult | TMDBTVShowResult>;
+    popularity?: number;
+}
+
+export type MultiSearchResult = TMDBMovieResult | TMDBTVShowResult | TMDBPersonResult;
+
 export interface TvSeasonDetails {
-    _id: string;
+    id: number;
     air_date: string;
     episodes: Episode[];
     crew: CrewMember[];
@@ -119,7 +129,7 @@ export interface GuestStar {
 }
 
 export interface TMDBTVShowResult {
-    backdrop_path: string;
+    backdrop_path: string | null;
     first_air_date: string;
     genre_ids: number[];
     id: number; // Defaults to 0
@@ -129,7 +139,7 @@ export interface TMDBTVShowResult {
     original_name: string;
     overview: string;
     popularity: number; // Defaults to 0
-    poster_path: string;
+    poster_path: string | null;
     vote_average: number; // Defaults to 0
     vote_count: number; // Defaults to 0
 }
@@ -258,7 +268,7 @@ export interface TMDBVideos {
 // Main interface representing a TV show (or similar media)
 export interface TMDBTVShowDetails {
     adult: boolean; // Defaults to true
-    backdrop_path: string;
+    backdrop_path: string | null;
     created_by: CreatedBy[];
     episode_run_time: number[];
     first_air_date: string;
@@ -268,8 +278,8 @@ export interface TMDBTVShowDetails {
     in_production: boolean; // Defaults to true
     languages: string[];
     last_air_date: string;
-    last_episode_to_air: Episode;
-    next_episode_to_air: string;
+    last_episode_to_air: Episode | null;
+    next_episode_to_air: Episode | null;
     networks: Network[];
     number_of_episodes: number; // Defaults to 0
     number_of_seasons: number; // Defaults to 0
@@ -278,13 +288,13 @@ export interface TMDBTVShowDetails {
     original_name: string;
     overview: string;
     popularity: number; // Defaults to 0
-    poster_path: string;
+    poster_path: string | null;
     production_companies: ProductionCompany[];
     production_countries: ProductionCountry[];
     seasons: Season[];
     spoken_languages: SpokenLanguage[];
     status: string;
-    tagline: string;
+    tagline?: string | null;
     type: string;
     vote_average: number; // Defaults to 0
     vote_count: number; // Defaults to 0
