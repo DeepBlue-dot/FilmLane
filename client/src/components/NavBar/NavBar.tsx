@@ -60,39 +60,35 @@ const NavBar: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            {isAuthenticated && (
-              <div className="hidden md:flex ml-10 space-x-6">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className={`text-sm font-medium transition-colors ${
-                      isActive(link.path)
-                        ? 'text-indigo-400 font-semibold'
-                        : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <div className="hidden md:flex ml-10 space-x-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive(link.path)
+                      ? 'text-indigo-400 font-semibold'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
           </div>
 
           {/* Desktop Search & User Profile section */}
           <div className="hidden md:flex items-center gap-4">
-            {isAuthenticated && (
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search movies & shows..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-60 bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500 focus:w-72 transition-all"
-                />
-                <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
-              </form>
-            )}
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                placeholder="Search movies & shows..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-60 bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500 focus:w-72 transition-all"
+              />
+              <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
+            </form>
 
             {isAuthenticated ? (
               <div className="relative">
@@ -153,20 +149,18 @@ const NavBar: React.FC = () => {
 
           {/* Mobile menu toggle */}
           <div className="md:hidden flex items-center gap-2">
-            {isAuthenticated && (
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-gray-400 hover:text-white focus:outline-none cursor-pointer"
-              >
-                {mobileMenuOpen ? <RiCloseLine className="w-6 h-6" /> : <RiMenu3Line className="w-6 h-6" />}
-              </button>
-            )}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-gray-400 hover:text-white focus:outline-none cursor-pointer"
+            >
+              {mobileMenuOpen ? <RiCloseLine className="w-6 h-6" /> : <RiMenu3Line className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu Panel */}
-      {mobileMenuOpen && isAuthenticated && (
+      {mobileMenuOpen && (
         <div className="md:hidden bg-gray-950 border-t border-gray-900 px-4 pt-2 pb-4 space-y-3">
           <form onSubmit={handleSearchSubmit} className="relative mt-2">
             <input
@@ -196,37 +190,50 @@ const NavBar: React.FC = () => {
           </div>
 
           <div className="border-t border-gray-900 my-2 pt-2">
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-bold text-sm">
-                {user?.username?.charAt(0).toUpperCase() || 'U'}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white truncate">{user?.username}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-              </div>
-            </div>
+            {isAuthenticated ? (
+              <>
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="w-8 h-8 rounded-full bg-indigo-600/30 border border-indigo-500/50 flex items-center justify-center text-indigo-400 font-bold text-sm">
+                    {user?.username?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white truncate">{user?.username}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                </div>
 
-            <div className="mt-2 space-y-1">
-              <Link to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
-                <RiUser3Line className="w-4 h-4" />
-                My Profile
-              </Link>
-              <Link to="/profile?tab=watchlist" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
-                <RiHeartLine className="w-4 h-4" />
-                Watchlist
-              </Link>
-              <Link to="/profile?tab=history" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
-                <RiHistoryLine className="w-4 h-4" />
-                History
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-red-400 hover:bg-gray-900 hover:text-red-300 transition-colors text-left cursor-pointer"
-              >
-                <RiLogoutBoxRLine className="w-4 h-4" />
-                Sign Out
-              </button>
-            </div>
+                <div className="mt-2 space-y-1">
+                  <Link to="/profile" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
+                    <RiUser3Line className="w-4 h-4" />
+                    My Profile
+                  </Link>
+                  <Link to="/profile?tab=watchlist" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
+                    <RiHeartLine className="w-4 h-4" />
+                    Watchlist
+                  </Link>
+                  <Link to="/profile?tab=history" className="flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors">
+                    <RiHistoryLine className="w-4 h-4" />
+                    History
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-red-400 hover:bg-gray-900 hover:text-red-300 transition-colors text-left cursor-pointer"
+                  >
+                    <RiLogoutBoxRLine className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2 px-3">
+                <Link to="/login" className="block text-center px-4 py-2 rounded-full border border-gray-800 text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-900 transition-colors">
+                  Sign In
+                </Link>
+                <Link to="/register" className="block text-center px-4 py-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white transition-colors">
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

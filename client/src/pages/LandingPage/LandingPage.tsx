@@ -68,17 +68,17 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link
-              to="/login"
+              to="/home"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full px-8 py-3.5 transition-all shadow-lg hover:shadow-indigo-500/20"
             >
-              Start Curating List
+              Browse Movies & Shows
               <RiArrowRightUpLine className="w-4 h-4" />
             </Link>
             <Link
-              to="/register"
+              to="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center bg-gray-900 hover:bg-gray-850 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white font-semibold rounded-full px-8 py-3.5 transition-all"
             >
-              Create Account
+              Sign In
             </Link>
           </div>
         </div>

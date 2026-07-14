@@ -21,7 +21,8 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      const from = (location.state as any)?.from || '/home';
+      const state = location.state as { from?: string } | null;
+      const from = state?.from || '/home';
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const axiosError = err as { message?: string };
