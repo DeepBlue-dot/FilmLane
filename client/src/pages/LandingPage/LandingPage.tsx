@@ -1,49 +1,93 @@
-import { Link } from "react-router-dom";
-import Footer from "../../components/Footer/Footer";
-import NavBar from "./NavBar";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import NavBar from '../../components/NavBar/NavBar.js';
+import Footer from '../../components/Footer/Footer.js';
+import { RiMovie2Line, RiSearchLine, RiArrowRightUpLine } from 'react-icons/ri';
 
 export default function LandingPage() {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <NavBar />
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-800 dark:to-gray-900 px-4 py-16">
-      <div className="absolute top-0 z-[-2] h-screen w-screen bg-[#000000] bg-[radial-gradient(#ffffff33_1px,#00091d_1px)] bg-[size:20px_20px]"></div>
-        <div className="text-center max-w-2xl mx-4">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 animate-fade-in-down">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-pink-600 dark:from-indigo-400 dark:to-pink-400">
-              POPCORNMOVIES
-            </span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 animate-fade-in-down delay-100">
-            70,000+ Movies · 35,000+ TV Shows · Live Broadcasts
-          </p>
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
 
-          <div className="relative max-w-lg mx-auto mb-8 animate-fade-in-down delay-200">
-            <div className="flex items-center relative">
-              <input
-                type="text"
-                placeholder="Search movies, shows, and more..."
-                aria-label="Search movies and TV shows"
-                className="w-full px-6 py-4 border border-gray-300 dark:border-gray-700 rounded-full text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 dark:focus:ring-indigo-400/30 transition-all pr-14"
-              />
-              <button className="absolute right-4 p-2 text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      // Unauthenticated users search triggers a redirect to login
+      navigate(`/login?query=${encodeURIComponent(query.trim())}`);
+    } else {
+      navigate('/login');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-950 text-white overflow-hidden relative">
+      {/* Background decoration elements */}
+      <div className="absolute top-0 inset-x-0 h-96 bg-[radial-gradient(circle_at_top,rgba(79,70,229,0.15),transparent_60%)]"></div>
+      <div className="absolute bottom-0 inset-x-0 h-96 bg-[radial-gradient(circle_at_bottom,rgba(219,39,119,0.1),transparent_60%)]"></div>
+      <div className="absolute inset-0 bg-[#000000] bg-[radial-gradient(#ffffff07_1px,transparent_1px)] bg-[size:32px_32px] opacity-70"></div>
+
+      {/* Global Navigation Header */}
+      <NavBar />
+
+      {/* Main Content Area */}
+      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 z-10">
+        <div className="text-center max-w-3xl space-y-8 animate-fade-in-up">
+          {/* Badge indicator */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
+            <RiMovie2Line className="w-3.5 h-3.5" />
+            Introducing FilmLane v1.0
           </div>
 
-          <Link
-            to="/home"
-            className="inline-block bg-indigo-600 hover:bg-indigo-700 transition-all duration-200 text-white font-semibold rounded-full px-8 py-3 shadow-lg hover:shadow-indigo-500/30 dark:hover:shadow-indigo-400/30 animate-fade-in-down delay-300"
-          >
-            Start Exploring Now
-            <span className="ml-2">→</span>
-          </Link>
+          {/* Heading */}
+          <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight leading-tight">
+            Navigate Your Personal{' '}
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
+              Cinema Universe
+            </span>
+          </h1>
+
+          {/* Description */}
+          <p className="text-base sm:text-lg text-gray-400 max-w-xl mx-auto leading-relaxed">
+            Get instant metadata, curate your custom watchlist, record your watch history logs, and discover thousands of movies and series from around the world.
+          </p>
+
+          {/* Search bar redirecting to login */}
+          <form onSubmit={handleSearch} className="max-w-lg mx-auto relative flex items-center">
+            <input
+              type="text"
+              placeholder="Search movies, TV shows, genres..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full bg-gray-900/60 backdrop-blur border border-gray-800 focus:border-indigo-500 text-white rounded-full pl-12 pr-16 py-3.5 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm sm:text-base placeholder-gray-500"
+            />
+            <RiSearchLine className="absolute left-4 w-5 h-5 text-gray-500" />
+            <button
+              type="submit"
+              className="absolute right-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 font-semibold text-xs sm:text-sm text-white rounded-full transition-all shadow-md cursor-pointer"
+            >
+              Search
+            </button>
+          </form>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <Link
+              to="/login"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full px-8 py-3.5 transition-all shadow-lg hover:shadow-indigo-500/20"
+            >
+              Start Curating List
+              <RiArrowRightUpLine className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/register"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-gray-900 hover:bg-gray-850 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white font-semibold rounded-full px-8 py-3.5 transition-all"
+            >
+              Create Account
+            </Link>
+          </div>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
       <Footer />
     </div>
   );

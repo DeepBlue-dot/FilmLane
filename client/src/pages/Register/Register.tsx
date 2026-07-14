@@ -1,119 +1,205 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { api } from '../../services/api.js';
+import { Input } from '../../components/ui/input.js';
+import { Button } from '../../components/ui/button.js';
+import { RiMovie2Line } from 'react-icons/ri';
 
 const RegisterPage: React.FC = () => {
+  const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMsg(null);
+    setSuccessMsg(null);
 
-    // Basic validations
+    // Basic password matches validation
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    if (!termsAccepted) {
-      alert('You must accept the terms and conditions');
+      setErrorMsg('Passwords do not match');
       return;
     }
 
-    // TODO: Handle registration logic (e.g., API call)
-    console.log({ email, password });
+    if (password.length < 8) {
+      setErrorMsg('Password must be at least 8 characters long');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const response = await api.post('/auth/register', {
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      if (response.data?.status === 'success') {
+        setSuccessMsg('Registration successful! Redirecting to login page...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message || 'Registration failed. Please try again.');
+      setSubmitting(false);
+    }
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-          <img
-            className="w-8 h-8 mr-2"
-            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-            alt="logo"
-          />
-          Flowbite
-        </a>
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              Create an account
-            </h1>
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Your email
-                </label>
+    <section className="relative min-h-screen flex items-center justify-center bg-gray-950 px-4 py-12 overflow-hidden">
+      {/* Background radial gradients */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(79,70,229,0.15),transparent_45%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(219,39,119,0.1),transparent_40%)]"></div>
+      <div className="absolute top-0 z-[-2] h-screen w-screen bg-[#000000] bg-[radial-gradient(#ffffff11_1px,#00091d_1px)] bg-[size:20px_20px]"></div>
+
+      <div className="w-full max-w-md z-10">
+        {/* Brand Logo Header */}
+        <div className="flex flex-col items-center mb-8">
+          <Link to="/" className="flex items-center gap-2 text-3xl font-extrabold tracking-wider text-white">
+            <RiMovie2Line className="w-9 h-9 text-indigo-500 animate-pulse" />
+            <span>
+              FILM<span className="text-indigo-500">LANE</span>
+            </span>
+          </Link>
+          <p className="text-gray-400 mt-2 text-sm">Your personal cinema library navigator</p>
+        </div>
+
+        {/* Register Card */}
+        <div className="bg-gray-900/60 backdrop-blur-xl border border-gray-800/80 rounded-2xl shadow-2xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Create Account</h2>
+
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-900/40 border border-red-800 text-red-200 text-sm rounded-lg">
+              {errorMsg}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="mb-4 p-3 bg-emerald-900/40 border border-emerald-800 text-emerald-200 text-sm rounded-lg">
+              {successMsg}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                Username
+              </label>
+              <Input
+                type="text"
+                name="username"
+                id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="john_doe"
+                required
+                disabled={submitting}
+                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                name="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                required
+                disabled={submitting}
+                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                Password
+              </label>
+              <Input
+                type="password"
+                name="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="•••••••• (min 8 chars)"
+                required
+                disabled={submitting}
+                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                Confirm Password
+              </label>
+              <Input
+                type="password"
+                name="confirmPassword"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                disabled={submitting}
+                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+              />
+            </div>
+
+            <div className="flex items-start text-sm py-2">
+              <label className="flex items-start text-gray-400 cursor-pointer">
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com"
+                  type="checkbox"
                   required
+                  disabled={submitting}
+                  className="rounded bg-gray-950 border-gray-800 text-indigo-600 focus:ring-indigo-500/20 mr-2 mt-0.5 h-4 w-4"
                 />
-              </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="confirm-password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Confirm password
-                </label>
-                <input
-                  type="password"
-                  name="confirm-password"
-                  id="confirm-password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div className="flex items-start">
-                <div className="flex items-center h-5">
-                  <input
-                    id="terms"
-                    aria-describedby="terms"
-                    type="checkbox"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-                    required
-                  />
-                </div>
-                <div className="ml-3 text-sm">
-                  <label htmlFor="terms" className="font-light text-gray-500 dark:text-gray-300">
-                    I accept the <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Terms and Conditions</a>
-                  </label>
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-              >
-                Create an account
-              </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Login here</a>
-              </p>
-            </form>
-          </div>
+                <span>
+                  I agree to the{' '}
+                  <a href="#" className="text-indigo-400 hover:underline">
+                    Terms of Service
+                  </a>{' '}
+                  and{' '}
+                  <a href="#" className="text-indigo-400 hover:underline">
+                    Privacy Policy
+                  </a>
+                </span>
+              </label>
+            </div>
+
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {submitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Creating account...
+                </>
+              ) : (
+                'Create Account'
+              )}
+            </Button>
+
+            <p className="text-sm font-light text-gray-400 text-center mt-4">
+              Already have an account?{' '}
+              <Link to="/login" className="font-semibold text-indigo-400 hover:underline hover:text-indigo-300">
+                Login here
+              </Link>
+            </p>
+          </form>
         </div>
       </div>
     </section>

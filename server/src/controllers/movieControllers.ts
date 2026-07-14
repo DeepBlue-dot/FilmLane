@@ -149,3 +149,41 @@ export const getLanguagesList = asyncHandler(
         res.status(200).json(tvResponse)
     }
 )
+
+export const getTVSimilar = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const page = Number(req.query.page) || 1;
+        const response = await tmdb.getTVSimilar(Number(req.params.series_id), page);
+        res.status(200).json(response);
+    }
+)
+
+export const getTVRecommendations = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const page = Number(req.query.page) || 1;
+        const response = await tmdb.getTVRecommendations(Number(req.params.series_id), page);
+        res.status(200).json(response);
+    }
+)
+
+export const searchPerson = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const options = {
+            query: req.query.query as string,
+            page: Number(req.query.page) || 1,
+        };
+        const response = await tmdb.searchPerson(options);
+        res.status(200).json(response);
+    }
+)
+
+export const getPersonDetails = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const response = await tmdb.getPersonDetails(Number(req.params.id));
+        res.status(200).json(response);
+    }
+)

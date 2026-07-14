@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { discoverMovies, discoverTvShows, getCountriesList, getLanguagesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows } from "../controllers/movieControllers.js";
+import { discoverMovies, discoverTvShows, getCountriesList, getLanguagesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows, getTVSimilar, getTVRecommendations, searchPerson, getPersonDetails } from "../controllers/movieControllers.js";
 
 const movieRoutes: Router= Router()
 
@@ -18,5 +18,13 @@ movieRoutes.get("/search/tv", searchTVShows)
 movieRoutes.get("/search/multi", searchAll)
 movieRoutes.get("/countries", getCountriesList)
 movieRoutes.get("/Languages", getLanguagesList)
+
+// TV similar and recommendations
+movieRoutes.get("/tv/:series_id/similar", getTVSimilar)
+movieRoutes.get("/tv/:series_id/recommendations", getTVRecommendations)
+
+// Person endpoints
+movieRoutes.get("/person/:id", getPersonDetails)
+movieRoutes.get("/search/person", searchPerson)
 
 export default movieRoutes;

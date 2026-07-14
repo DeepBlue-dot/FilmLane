@@ -1,163 +1,71 @@
-import { Link } from "react-router-dom";
-import {
-  AtSymbolIcon,
-  CameraIcon,
-  PlayIcon,
-} from "@heroicons/react/24/outline";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { RiMovie2Line, RiFacebookBoxFill, RiTwitterXFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
 
-export default function Footer() {
+const Footer: React.FC = () => {
   return (
-    <footer className="bg-white dark:bg-gray-900">
-      <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
-        <div className="md:flex md:justify-between">
-          {/* Logo and Description Section */}
-          <div className="mb-6 md:mb-0">
-            <Link to="/" className="flex items-center">
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                PopcornMovies
+    <footer className="bg-gray-950 border-t border-gray-900 text-gray-400 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Logo and Intro */}
+          <div className="md:col-span-1 space-y-4">
+            <Link to="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-wider text-white">
+              <RiMovie2Line className="w-7 h-7 text-indigo-500" />
+              <span>
+                FILM<span className="text-indigo-500">LANE</span>
               </span>
             </Link>
-            <p className="mt-4 max-w-[300px] text-gray-500 dark:text-gray-400">
-              The best place to watch movies online for free with HD quality,
-              Free TV Shows and stream live.
+            <p className="text-sm leading-relaxed text-gray-500">
+              The ultimate destination to discover and track your favorite movies & TV shows. Browse summaries, discover releases, and navigate reviews.
             </p>
+            <div className="flex space-x-4">
+              <a href="#" className="hover:text-indigo-400 transition-colors"><RiFacebookBoxFill className="w-5 h-5" /></a>
+              <a href="#" className="hover:text-indigo-400 transition-colors"><RiTwitterXFill className="w-5 h-5" /></a>
+              <a href="#" className="hover:text-indigo-400 transition-colors"><RiInstagramFill className="w-5 h-5" /></a>
+              <a href="#" className="hover:text-indigo-400 transition-colors"><RiYoutubeFill className="w-5 h-5" /></a>
+            </div>
           </div>
 
-          {/* Links Grid */}
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
-            {/* Browse Column */}
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-                Browse
-              </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium space-y-3">
-                <li>
-                  <Link to="/movies" className="hover:underline cursor-pointer">
-                    Movies
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/trending"
-                    className="hover:underline cursor-pointer"
-                  >
-                    Trending
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/actors" className="hover:underline cursor-pointer">
-                    Popular
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Browse Links */}
+          <div>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Browse</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link to="/home" className="hover:text-white transition-colors">Home Dashboard</Link></li>
+              <li><Link to="/movies" className="hover:text-white transition-colors">Latest Movies</Link></li>
+              <li><Link to="/tv" className="hover:text-white transition-colors">TV Series</Link></li>
+              <li><Link to="/topIMDB" className="hover:text-white transition-colors">Top Rated IMDb</Link></li>
+            </ul>
+          </div>
 
-            {/* TV Shows Column */}
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-                TV Shows
-              </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium space-y-3">
-                <li>
-                  <Link
-                    to="/tv-shows"
-                    className="hover:underline cursor-pointer"
-                  >
-                    TV Shows
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/collections"
-                    className="hover:underline cursor-pointer"
-                  >
-                    Trending
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/request"
-                    className="hover:underline cursor-pointer"
-                  >
-                    Popular
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Genres Links */}
+          <div>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Explore</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link to="/genre?type=action" className="hover:text-white transition-colors">Action & Adventure</Link></li>
+              <li><Link to="/genre?type=comedy" className="hover:text-white transition-colors">Comedies</Link></li>
+              <li><Link to="/genre?type=sci-fi" className="hover:text-white transition-colors">Sci-Fi & Fantasy</Link></li>
+              <li><Link to="/genre?type=drama" className="hover:text-white transition-colors">Drama & Romance</Link></li>
+            </ul>
+          </div>
 
-            {/* About Column */}
-            <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-                About
-              </h2>
-              <ul className="text-gray-500 dark:text-gray-400 font-medium space-y-3">
-                <li>
-                  <Link
-                    to="/privacy-policy"
-                    className="hover:underline cursor-pointer"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/cookie-policy"
-                    className="hover:underline cursor-pointer"
-                  >
-                    Cookie Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="hover:underline cursor-pointer">
-                    Terms
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          {/* Support / Info */}
+          <div>
+            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Help & Support</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Contact Support</a></li>
+            </ul>
           </div>
         </div>
 
-        <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-
-        {/* Copyright and Social Icons Section */}
-        <div className="sm:flex sm:items-center sm:justify-between">
-          <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
-            © 2025{" "}
-            <Link to="/" className="hover:underline">
-              PopcornMovies™
-            </Link>
-            . All Rights Reserved.
-          </span>
-
-          {/* Social Icons */}
-          <div className="flex mt-4 sm:justify-center sm:mt-0 space-x-5">
-            <a
-              href="https://twitter.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            >
-              <AtSymbolIcon className="h-6 w-6" />
-            </a>
-            <a
-              href="https://instagram.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            >
-              <CameraIcon className="h-6 w-6" />
-            </a>
-            <a
-              href="https://youtube.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-            >
-              <PlayIcon className="h-6 w-6" />
-            </a>
-          </div>
+        <div className="mt-12 pt-8 border-t border-gray-900 text-center text-xs text-gray-600">
+          <p>© {new Date().getFullYear()} FilmLane. Developed as a premium movie discovery platform. All rights reserved.</p>
         </div>
       </div>
     </footer>
   );
-}
+};
+
+export default Footer;
