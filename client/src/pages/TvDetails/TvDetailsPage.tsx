@@ -6,18 +6,35 @@ import { MediaCarousel } from '../../components/features/MediaCarousel.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { Badge } from '../../components/ui/badge.js';
 import { RiPlayFill, RiHeartLine, RiHeartFill, RiStarFill, RiTimeLine, RiCalendarLine } from 'react-icons/ri';
+import { MediaDetails, VideoResult, Genre, Episode } from '../../types/media.js';
+
+interface Season {
+  id: number;
+  name: string;
+  season_number: number;
+  episode_count: number;
+  poster_path: string | null;
+}
+
+interface CastMember {
+  id: number;
+  name: string;
+  character?: string;
+  roles?: { character: string }[];
+  profile_path: string | null;
+}
 
 export default function TvDetailsPage() {
   const { tvId, season_number } = useParams<{ tvId: string; season_number?: string }>();
   const navigate = useNavigate();
 
-  const [series, setSeries] = useState<any>(null);
+  const [series, setSeries] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Season and Episode States
   const [activeSeasonNum, setActiveSeasonNum] = useState<number>(season_number ? parseInt(season_number, 10) : 1);
-  const [seasonEpisodes, setSeasonEpisodes] = useState<any[]>([]);
+  const [seasonEpisodes, setSeasonEpisodes] = useState<Episode[]>([]);
   const [episodesLoading, setEpisodesLoading] = useState(false);
   const [episodesError, setEpisodesError] = useState<string | null>(null);
 
@@ -38,7 +55,7 @@ export default function TvDetailsPage() {
         } else {
           setSeries(response.data);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching TV details', err);
         setError('Failed to load TV series details. Please try again.');
       } finally {
@@ -112,7 +129,7 @@ export default function TvDetailsPage() {
   const releaseYear = series.first_air_date ? series.first_air_date.split('-')[0] : 'N/A';
   
   // Get representative runtime
-  const duration = series.episode_run_time?.length > 0 ? `${series.episode_run_time[0]} min` : 'N/A';
+  const duration = series.episode_run_time && series.episode_run_time.length > 0 ? `${series.episode_run_time[0]} min` : 'N/A';
 
   const backdropUrl = series.backdrop_path
     ? `https://image.tmdb.org/t/p/original${series.backdrop_path}`
@@ -123,7 +140,7 @@ export default function TvDetailsPage() {
     : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=342&auto=format&fit=crop';
 
   const trailer = series.videos?.results?.find(
-    (video: any) => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
+    (video: VideoResult) => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
   );
 
   const castList = series.credits?.cast?.slice(0, 10) || [];
@@ -189,7 +206,7 @@ export default function TvDetailsPage() {
 
             {/* Genres */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              {series.genres?.map((genre: any) => (
+              {series.genres?.map((genre: Genre) => (
                 <Badge key={genre.id} variant="outline" className="bg-indigo-600/10 border-indigo-500/20 text-indigo-400 px-3 py-1">
                   {genre.name}
                 </Badge>
@@ -248,7 +265,7 @@ export default function TvDetailsPage() {
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">Top Billed Cast</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                  {castList.map((cast: any) => {
+                  {castList.map((cast: CastMember) => {
                     const avatarUrl = cast.profile_path
                       ? `https://image.tmdb.org/t/p/w185${cast.profile_path}`
                       : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop';
@@ -260,7 +277,7 @@ export default function TvDetailsPage() {
                         <div>
                           <p className="text-xs font-semibold text-white truncate">{cast.name}</p>
                           <p className="text-[10px] text-gray-500 truncate">
-                            {cast.roles?.length > 0 ? cast.roles[0].character : cast.character}
+                            {cast.roles && cast.roles.length > 0 ? cast.roles[0].character : cast.character}
                           </p>
                         </div>
                       </div>
@@ -281,7 +298,7 @@ export default function TvDetailsPage() {
                   onChange={(e) => handleSeasonChange(parseInt(e.target.value, 10))}
                   className="bg-gray-900/60 border border-gray-800 text-white text-sm rounded-xl px-4 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer"
                 >
-                  {seasonsList.map((s: any) => (
+                  {seasonsList.map((s: Season) => (
                     <option key={s.id} value={s.season_number}>
                       {s.name} ({s.episode_count} Episodes)
                     </option>
@@ -310,7 +327,7 @@ export default function TvDetailsPage() {
                 <div className="text-gray-500 text-center py-8">No episodes loaded for this season.</div>
               ) : (
                 <div className="space-y-4">
-                  {seasonEpisodes.map((ep: any) => {
+                  {seasonEpisodes.map((ep: Episode) => {
                     const stillUrl = ep.still_path
                       ? `https://image.tmdb.org/t/p/w300${ep.still_path}`
                       : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=300&auto=format&fit=crop';
@@ -400,10 +417,10 @@ export default function TvDetailsPage() {
                   <span className="text-white font-medium uppercase">{series.original_language}</span>
                 </div>
               )}
-              {series.networks?.length > 0 && (
+              {series.networks && series.networks.length > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Network</span>
-                  <span className="text-white font-medium">{series.networks[0].name}</span>
+                  <span className="text-white font-medium">{series.networks[0]?.name}</span>
                 </div>
               )}
             </div>

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
 import { RiMovie2Line, RiSearchLine, RiUser3Line, RiLogoutBoxRLine, RiHeartLine, RiHistoryLine, RiMenu3Line, RiCloseLine } from 'react-icons/ri';
+import { api } from '../../services/api.js';
+import { Genre } from '../../types/media.js';
 
 const NavBar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -12,11 +14,35 @@ const NavBar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
+  const [movieGenres, setMovieGenres] = useState<Genre[]>([]);
+  const [tvGenres, setTvGenres] = useState<Genre[]>([]);
+  const [genresDropdownOpen, setGenresDropdownOpen] = useState(false);
+  const [mobileGenresOpen, setMobileGenresOpen] = useState(false);
+
   // Close dropdowns on route changes
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileDropdownOpen(false);
+    setGenresDropdownOpen(false);
+    setMobileGenresOpen(false);
   }, [location.pathname]);
+
+  // Fetch Genres list on mount
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const [movieRes, tvRes] = await Promise.all([
+          api.get('/genre/movie/list'),
+          api.get('/genre/tv/list')
+        ]);
+        setMovieGenres(movieRes.data?.genres || movieRes.data || []);
+        setTvGenres(tvRes.data?.genres || tvRes.data || []);
+      } catch (err) {
+        console.error('Error fetching genres in NavBar', err);
+      }
+    };
+    fetchGenres();
+  }, []);
 
   // Sync search input with URL if query is present
   useEffect(() => {
@@ -60,7 +86,7 @@ const NavBar: React.FC = () => {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden md:flex ml-10 space-x-6">
+            <div className="hidden md:flex ml-10 space-x-6 items-center">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
@@ -74,6 +100,63 @@ const NavBar: React.FC = () => {
                   {link.name}
                 </Link>
               ))}
+
+              {/* Genres Hoverable Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setGenresDropdownOpen(true)}
+                onMouseLeave={() => setGenresDropdownOpen(false)}
+              >
+                <button
+                  className="text-sm font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-1 cursor-pointer focus:outline-none py-2"
+                >
+                  <span>Genres</span>
+                  <svg 
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${genresDropdownOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {genresDropdownOpen && (
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-[480px] bg-gray-950/95 border border-gray-800 rounded-2xl shadow-2xl p-5 z-50 backdrop-blur-md grid grid-cols-2 gap-6">
+                    {/* Movie Genres column */}
+                    <div>
+                      <h4 className="text-xs uppercase font-extrabold tracking-wider text-indigo-400 mb-3 border-b border-gray-800/80 pb-1.5">Movies</h4>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 max-h-[300px] overflow-y-auto pr-1 select-none">
+                        {movieGenres.map((genre) => (
+                          <Link
+                            key={`movie-genre-${genre.id}`}
+                            to={`/movies?genre=${genre.id}`}
+                            className="text-xs text-gray-400 hover:text-white hover:bg-indigo-600/10 px-2 py-1 rounded-md transition-all truncate"
+                          >
+                            {genre.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* TV Genres column */}
+                    <div>
+                      <h4 className="text-xs uppercase font-extrabold tracking-wider text-indigo-400 mb-3 border-b border-gray-800/80 pb-1.5">TV Shows</h4>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 max-h-[300px] overflow-y-auto pr-1 select-none">
+                        {tvGenres.map((genre) => (
+                          <Link
+                            key={`tv-genre-${genre.id}`}
+                            to={`/tv?genre=${genre.id}`}
+                            className="text-xs text-gray-400 hover:text-white hover:bg-indigo-600/10 px-2 py-1 rounded-md transition-all truncate"
+                          >
+                            {genre.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -187,6 +270,57 @@ const NavBar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+
+            {/* Mobile Genres Collapsible */}
+            <div className="block">
+              <button
+                onClick={() => setMobileGenresOpen(!mobileGenresOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-900 hover:text-white transition-colors cursor-pointer"
+              >
+                <span>Genres</span>
+                <svg 
+                  className={`w-4 h-4 transition-transform duration-200 ${mobileGenresOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {mobileGenresOpen && (
+                <div className="pl-4 pr-2 py-2 mt-1 bg-gray-900/20 border border-gray-900/50 rounded-xl space-y-4">
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider mb-2">Movies</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {movieGenres.slice(0, 16).map((genre) => (
+                        <Link
+                          key={`mob-movie-genre-${genre.id}`}
+                          to={`/movies?genre=${genre.id}`}
+                          className="text-xs text-gray-400 hover:text-white py-1 block truncate"
+                        >
+                          {genre.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-indigo-400 tracking-wider mb-2">TV Shows</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {tvGenres.slice(0, 16).map((genre) => (
+                        <Link
+                          key={`mob-tv-genre-${genre.id}`}
+                          to={`/tv?genre=${genre.id}`}
+                          className="text-xs text-gray-400 hover:text-white py-1 block truncate"
+                        >
+                          {genre.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="border-t border-gray-900 my-2 pt-2">

@@ -1,3 +1,6 @@
-finsh tmdbservies class
-better error handling
-make the front end
+/plan i want u to improve the frontend. basically i want it to fully use the backend (server/README.md)
+(more featuers)
+when searching add word recomdations
+on  TMDB Error  
+for user history save the series seson and epsode
+add the 

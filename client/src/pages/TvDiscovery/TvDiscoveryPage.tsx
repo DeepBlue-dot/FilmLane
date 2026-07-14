@@ -1,47 +1,68 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { MediaCard } from '../../components/features/MediaCard.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiFilterLine } from 'react-icons/ri';
-
-interface Genre {
-  id: number;
-  name: string;
-}
+import { MediaItem, Genre, Language } from '../../types/media.js';
 
 export default function TvDiscoveryPage() {
-  const [shows, setShows] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
+  const genreParam = searchParams.get('genre') || '';
+
+  const [shows, setShows] = useState<MediaItem[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Filter States
-  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [selectedGenre, setSelectedGenre] = useState<string>(genreParam);
   const [selectedYear, setSelectedYear] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+  const [selectedRating, setSelectedRating] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('popularity.desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const { watchlistIds, toggleWatchlist } = useWatchlist();
 
-  // Load TV Genres on Mount
+  // Load Metadata on Mount
   useEffect(() => {
-    const fetchGenres = async () => {
+    const fetchMetadata = async () => {
       try {
-        const response = await api.get('/genre/tv/list');
-        // response.data is either { genres: [...] } or direct array
-        if (response.data?.genres) {
-          setGenres(response.data.genres);
-        } else if (Array.isArray(response.data)) {
-          setGenres(response.data);
+        const [genresRes, langsRes] = await Promise.all([
+          api.get('/genre/tv/list'),
+          api.get('/Languages')
+        ]);
+        
+        if (genresRes.data?.genres) {
+          setGenres(genresRes.data.genres);
+        } else if (Array.isArray(genresRes.data)) {
+          setGenres(genresRes.data);
         }
+
+        const sortedLangs = (langsRes.data || []).sort((a: Language, b: Language) => 
+          a.english_name.localeCompare(b.english_name)
+        );
+        setLanguages(sortedLangs);
       } catch (err) {
-        console.error('Error fetching TV genres', err);
+        console.error('Error fetching TV metadata', err);
       }
     };
-    fetchGenres();
+    fetchMetadata();
   }, []);
+
+  // Sync selectedGenre if genreParam in URL changes
+  useEffect(() => {
+    if (genreParam) {
+      setSelectedGenre(genreParam);
+    } else {
+      setSelectedGenre('');
+    }
+    setCurrentPage(1);
+  }, [genreParam]);
 
   // Fetch TV Shows on filter/page change
   useEffect(() => {
@@ -49,7 +70,7 @@ export default function TvDiscoveryPage() {
       setLoading(true);
       setError(null);
       try {
-        const params: Record<string, any> = {
+        const params: Record<string, string | number | boolean | undefined> = {
           sort_by: sortBy,
           page: currentPage,
         };
@@ -62,12 +83,20 @@ export default function TvDiscoveryPage() {
           params.first_air_date_year = parseInt(selectedYear, 10);
         }
 
+        if (selectedLanguage) {
+          params.with_original_language = selectedLanguage;
+        }
+
+        if (selectedRating) {
+          params.vote_average_gte = parseFloat(selectedRating);
+        }
+
         const response = await api.get('/discover/tv', { params });
         if (response.data) {
-          setShows(response.data.results || []);
+          setShows((response.data.results || []) as MediaItem[]);
           setTotalPages(Math.min(response.data.total_pages || 1, 500)); // TMDB limits discover page queries to 500 pages
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching discovered TV shows', err);
         setError('Failed to fetch TV shows. Please try again.');
       } finally {
@@ -76,7 +105,7 @@ export default function TvDiscoveryPage() {
     };
 
     fetchShows();
-  }, [sortBy, selectedGenre, selectedYear, currentPage]);
+  }, [sortBy, selectedGenre, selectedYear, selectedLanguage, selectedRating, currentPage]);
 
   const handleBookmarkToggle = async (id: number, type: 'movie' | 'tv') => {
     await toggleWatchlist(id, type);
@@ -89,6 +118,16 @@ export default function TvDiscoveryPage() {
 
   const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedYear(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedLanguage(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleRatingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRating(e.target.value);
     setCurrentPage(1);
   };
 
@@ -150,6 +189,33 @@ export default function TvDiscoveryPage() {
                 {yr}
               </option>
             ))}
+          </select>
+
+          {/* Language Dropdown */}
+          <select
+            value={selectedLanguage}
+            onChange={handleLanguageChange}
+            className="bg-gray-900/60 border border-gray-850 text-gray-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[150px]"
+          >
+            <option value="">All Languages</option>
+            {languages.map((l) => (
+              <option key={l.iso_639_1} value={l.iso_639_1}>
+                {l.english_name}
+              </option>
+            ))}
+          </select>
+
+          {/* Rating Dropdown */}
+          <select
+            value={selectedRating}
+            onChange={handleRatingChange}
+            className="bg-gray-900/60 border border-gray-850 text-gray-200 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500 cursor-pointer"
+          >
+            <option value="">Any Rating</option>
+            <option value="8.0">8.0+ Stars</option>
+            <option value="7.0">7.0+ Stars</option>
+            <option value="6.0">6.0+ Stars</option>
+            <option value="5.0">5.0+ Stars</option>
           </select>
 
           {/* Sorting Dropdown */}

@@ -4,13 +4,14 @@ import { api } from '../../services/api.js';
 import { HeroSlider } from '../../components/features/HeroSlider.js';
 import { MediaCarousel } from '../../components/features/MediaCarousel.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
+import { MediaItem } from '../../types/media.js';
 
 export default function HomePage() {
-  const [heroMovies, setHeroMovies] = useState<any[]>([]);
-  const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
-  const [popularTvShows, setPopularTvShows] = useState<any[]>([]);
-  const [actionMovies, setActionMovies] = useState<any[]>([]);
-  const [comedyMovies, setComedyMovies] = useState<any[]>([]);
+  const [heroMovies, setHeroMovies] = useState<MediaItem[]>([]);
+  const [trendingMovies, setTrendingMovies] = useState<MediaItem[]>([]);
+  const [popularTvShows, setPopularTvShows] = useState<MediaItem[]>([]);
+  const [actionMovies, setActionMovies] = useState<MediaItem[]>([]);
+  const [comedyMovies, setComedyMovies] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { watchlistIds, toggleWatchlist } = useWatchlist();

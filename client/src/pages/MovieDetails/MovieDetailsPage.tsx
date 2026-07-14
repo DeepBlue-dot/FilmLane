@@ -6,10 +6,18 @@ import { MediaCarousel } from '../../components/features/MediaCarousel.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { Badge } from '../../components/ui/badge.js';
 import { RiPlayFill, RiHeartLine, RiHeartFill, RiStarFill, RiTimeLine, RiCalendarLine } from 'react-icons/ri';
+import { MediaDetails, VideoResult, Genre } from '../../types/media.js';
+
+interface CastMember {
+  id: number;
+  name: string;
+  character: string;
+  profile_path: string | null;
+}
 
 export default function MovieDetailsPage() {
   const { movieId } = useParams<{ movieId: string }>();
-  const [movie, setMovie] = useState<any>(null);
+  const [movie, setMovie] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +37,7 @@ export default function MovieDetailsPage() {
         } else {
           setMovie(response.data);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching movie details', err);
         setError('Failed to load movie details. Please try again.');
       } finally {
@@ -79,7 +87,7 @@ export default function MovieDetailsPage() {
 
   // Find trailer video
   const trailer = movie.videos?.results?.find(
-    (video: any) => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
+    (video: VideoResult) => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser')
   );
 
   const castList = movie.credits?.cast?.slice(0, 10) || [];
@@ -134,7 +142,7 @@ export default function MovieDetailsPage() {
 
             {/* Genres */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              {movie.genres?.map((genre: any) => (
+              {movie.genres?.map((genre: Genre) => (
                 <Badge key={genre.id} variant="outline" className="bg-indigo-600/10 border-indigo-500/20 text-indigo-400 px-3 py-1">
                   {genre.name}
                 </Badge>
@@ -190,7 +198,7 @@ export default function MovieDetailsPage() {
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-white uppercase tracking-wider">Top Billed Cast</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                  {castList.map((cast: any) => {
+                  {castList.map((cast: CastMember) => {
                     const avatarUrl = cast.profile_path
                       ? `https://image.tmdb.org/t/p/w185${cast.profile_path}`
                       : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop';
@@ -239,22 +247,22 @@ export default function MovieDetailsPage() {
                   <span className="text-white font-medium">{movie.release_date}</span>
                 </div>
               )}
-              {movie.budget > 0 && (
+              {movie.budget !== undefined && movie.budget > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Budget</span>
                   <span className="text-white font-medium">${movie.budget.toLocaleString()}</span>
                 </div>
               )}
-              {movie.revenue > 0 && (
+              {movie.revenue !== undefined && movie.revenue > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Revenue</span>
                   <span className="text-white font-medium">${movie.revenue.toLocaleString()}</span>
                 </div>
               )}
-              {movie.spoken_languages?.length > 0 && (
+              {movie.spoken_languages && movie.spoken_languages.length > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-500">Language</span>
-                  <span className="text-white font-medium">{movie.spoken_languages[0].english_name}</span>
+                  <span className="text-white font-medium">{movie.spoken_languages[0]?.english_name}</span>
                 </div>
               )}
             </div>

@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { MediaCard } from '../../components/features/MediaCard.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
-import { RiSearchLine, RiArrowLeftSLine, RiArrowRightSLine } from 'react-icons/ri';
+import { RiSearchLine, RiArrowLeftSLine, RiArrowRightSLine, RiFilterLine, RiCloseLine } from 'react-icons/ri';
+import { MediaItem, Genre, Language } from '../../types/media.js';
 
 export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('query') || '';
   const [inputValue, setInputValue] = useState(query);
   
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -20,14 +21,59 @@ export default function SearchPage() {
   const [totalResults, setTotalResults] = useState(0);
   const [activeTab, setActiveTab] = useState<'all' | 'movie' | 'tv'>('all');
 
+  // Filter & Config Lists
+  const [movieGenres, setMovieGenres] = useState<Genre[]>([]);
+  const [tvGenres, setTvGenres] = useState<Genre[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  
+  // Filter state
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedGenre, setSelectedGenre] = useState<string>('');
+  const [selectedYear, setSelectedYear] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+  const [selectedRating, setSelectedRating] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('');
+
   const { watchlistIds, toggleWatchlist } = useWatchlist();
+
+  // Combine and de-duplicate genres
+  const allGenres = useMemo(() => {
+    const map = new Map<number, string>();
+    movieGenres.forEach(g => map.set(g.id, g.name));
+    tvGenres.forEach(g => map.set(g.id, g.name));
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
+  }, [movieGenres, tvGenres]);
 
   // Keep input value in sync with URL query
   useEffect(() => {
     setInputValue(query);
   }, [query]);
 
-  // Fetch results when query, page or tab changes
+  // Fetch Genres & Languages once on mount
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        const [movieG, tvG, langList] = await Promise.all([
+          api.get('/genre/movie/list'),
+          api.get('/genre/tv/list'),
+          api.get('/Languages')
+        ]);
+        setMovieGenres(movieG.data?.genres || movieG.data || []);
+        setTvGenres(tvG.data?.genres || tvG.data || []);
+        
+        // Sorting languages alphabetically by English name
+        const sortedLangs = (langList.data || []).sort((a: Language, b: Language) => 
+          a.english_name.localeCompare(b.english_name)
+        );
+        setLanguages(sortedLangs);
+      } catch (err) {
+        console.error('Metadata fetching failed on search page', err);
+      }
+    };
+    fetchMetadata();
+  }, []);
+
+  // Fetch results when query, page, tab, or year (for movie/tv search backend API) changes
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -40,35 +86,41 @@ export default function SearchPage() {
       setLoading(true);
       setError(null);
       try {
-        // If they want to search only movies or tv, we can use specific endpoints or filter locally.
-        // Let's use search/multi and filter locally, or use specific endpoints.
-        // Multi search is best for general discovery.
-        // Let's call /search/multi on our proxy server.
         const endpoint = activeTab === 'all' 
           ? '/search/multi' 
           : activeTab === 'movie' 
             ? '/search/movie' 
             : '/search/tv';
         
-        const response = await api.get(endpoint, {
-          params: {
-            query: query.trim(),
-            page: currentPage,
-          },
-        });
+        const params: Record<string, string | number | boolean | undefined> = {
+          query: query.trim(),
+          page: currentPage,
+        };
+
+        // If searching specific movie/tv, pass release year to TMDB search endpoint
+        if (selectedYear) {
+          if (activeTab === 'movie') {
+            params.primary_release_year = selectedYear;
+          } else if (activeTab === 'tv') {
+            params.first_air_date_year = selectedYear;
+          }
+        }
+        
+        const response = await api.get(endpoint, { params });
 
         if (response.data) {
-          const fetchedResults = response.data.results || [];
-          // Multi search can return person items. Let's filter to movies/tv unless it's specific.
+          const fetchedResults = (response.data.results || []) as MediaItem[];
+          
+          // Filter multi search to only movies/tv
           const filtered = activeTab === 'all' 
-            ? fetchedResults.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv')
-            : fetchedResults.map((item: any) => ({ ...item, media_type: activeTab })); // add media_type back if movie/tv endpoint
+            ? fetchedResults.filter((item) => item.original_language && (item.title || item.name))
+            : fetchedResults.map((item) => ({ ...item, media_type: activeTab }));
           
           setResults(filtered);
           setTotalPages(response.data.total_pages || 1);
           setTotalResults(response.data.total_results || 0);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Search fetch failed', err);
         setError('Something went wrong. Please try again.');
       } finally {
@@ -76,9 +128,58 @@ export default function SearchPage() {
       }
     };
 
-    // Reset page if query changes
     fetchResults();
-  }, [query, currentPage, activeTab]);
+  }, [query, currentPage, activeTab, selectedYear]);
+
+  // Process filters and sorting locally
+  const processedResults = useMemo(() => {
+    let list = [...results];
+
+    // If in multi-search (all) and year is selected, filter locally
+    if (activeTab === 'all' && selectedYear) {
+      list = list.filter((item) => {
+        const year = (item.release_date || item.first_air_date || '').split('-')[0];
+        return year === selectedYear;
+      });
+    }
+
+    // Filter by Genre locally
+    if (selectedGenre) {
+      const gId = parseInt(selectedGenre, 10);
+      list = list.filter((item) => item.genre_ids?.includes(gId));
+    }
+
+    // Filter by Language locally
+    if (selectedLanguage) {
+      list = list.filter((item) => item.original_language === selectedLanguage);
+    }
+
+    // Filter by Rating locally
+    if (selectedRating) {
+      const rating = parseFloat(selectedRating);
+      list = list.filter((item) => (item.vote_average || 0) >= rating);
+    }
+
+    // Sort results locally
+    if (sortBy) {
+      list.sort((a, b) => {
+        if (sortBy === 'popularity.desc') {
+          return (b.popularity || 0) - (a.popularity || 0);
+        }
+        if (sortBy === 'vote_average.desc') {
+          return (b.vote_average || 0) - (a.vote_average || 0);
+        }
+        if (sortBy === 'release_date.desc') {
+          const dateA = a.release_date || a.first_air_date || '';
+          const dateB = b.release_date || b.first_air_date || '';
+          return dateB.localeCompare(dateA);
+        }
+        return 0;
+      });
+    }
+
+    return list;
+  }, [results, activeTab, selectedYear, selectedGenre, selectedLanguage, selectedRating, sortBy]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,6 +199,18 @@ export default function SearchPage() {
   const handleBookmarkToggle = async (id: number, type: 'movie' | 'tv') => {
     await toggleWatchlist(id, type);
   };
+
+  const handleClearFilters = () => {
+    setSelectedGenre('');
+    setSelectedYear('');
+    setSelectedLanguage('');
+    setSelectedRating('');
+    setSortBy('');
+  };
+
+  // Generate years list (current year back to 1970)
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1970 + 1 }, (_, i) => (currentYear - i).toString());
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -127,8 +240,8 @@ export default function SearchPage() {
       {query && (
         <div className="space-y-6">
           {/* Tabs Filter & Status Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-900 pb-4 gap-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-gray-900 pb-4 gap-4">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => { setActiveTab('all'); setCurrentPage(1); }}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
@@ -159,6 +272,21 @@ export default function SearchPage() {
               >
                 TV Shows
               </button>
+
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`ml-2 px-3.5 py-2 text-sm font-semibold rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+                  showFilters || selectedGenre || selectedYear || selectedLanguage || selectedRating || sortBy
+                    ? 'border-indigo-500 bg-indigo-600/10 text-indigo-400'
+                    : 'border-gray-800 text-gray-400 hover:text-white bg-gray-900/20'
+                }`}
+              >
+                <RiFilterLine className="w-4 h-4" />
+                <span>Filters</span>
+                {(selectedGenre || selectedYear || selectedLanguage || selectedRating || sortBy) && (
+                  <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
+                )}
+              </button>
             </div>
             
             <p className="text-sm text-gray-400">
@@ -166,6 +294,105 @@ export default function SearchPage() {
               <span className="text-indigo-400 font-semibold">{query}</span>&rdquo;
             </p>
           </div>
+
+          {/* Collapsible Filter Panel */}
+          {showFilters && (
+            <div className="p-5 bg-gray-900/40 border border-gray-850 rounded-2xl space-y-4 backdrop-blur-sm animate-fade-in shadow-lg">
+              <div className="flex items-center justify-between border-b border-gray-800/60 pb-3">
+                <span className="text-sm font-bold text-white flex items-center gap-2">
+                  <RiFilterLine className="text-indigo-500 w-4 h-4" />
+                  Advanced Filter Options
+                </span>
+                {(selectedGenre || selectedYear || selectedLanguage || selectedRating || sortBy) && (
+                  <button
+                    onClick={handleClearFilters}
+                    className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 cursor-pointer"
+                  >
+                    <RiCloseLine className="w-3.5 h-3.5" />
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                {/* Genre Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Genre</label>
+                  <select
+                    value={selectedGenre}
+                    onChange={(e) => setSelectedGenre(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="">All Genres</option>
+                    {allGenres.map((g) => (
+                      <option key={g.id} value={g.id}>{g.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Release Year Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Release Year</label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="">All Years</option>
+                    {years.map((yr) => (
+                      <option key={yr} value={yr}>{yr}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Language Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Language</label>
+                  <select
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="">All Languages</option>
+                    {languages.map((l) => (
+                      <option key={l.iso_639_1} value={l.iso_639_1}>{l.english_name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Rating Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Min Rating</label>
+                  <select
+                    value={selectedRating}
+                    onChange={(e) => setSelectedRating(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="">Any Rating</option>
+                    <option value="8.5">8.5+ Stars</option>
+                    <option value="7.5">7.5+ Stars</option>
+                    <option value="6.0">6.0+ Stars</option>
+                    <option value="4.0">4.0+ Stars</option>
+                  </select>
+                </div>
+
+                {/* Local Sorting Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase font-bold tracking-wider text-gray-400">Sort By</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  >
+                    <option value="">Relevance</option>
+                    <option value="popularity.desc">Popularity</option>
+                    <option value="vote_average.desc">IMDb Rating</option>
+                    <option value="release_date.desc">Release Date</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -184,19 +411,19 @@ export default function SearchPage() {
                 </div>
               ))}
             </div>
-          ) : results.length === 0 ? (
+          ) : processedResults.length === 0 ? (
             <div className="text-center py-16 text-gray-500 space-y-2">
               <p className="text-lg font-semibold text-gray-400">No results found</p>
-              <p className="text-sm">Double check the spelling or try searching for another title.</p>
+              <p className="text-sm">Try adjusting your search queries or filter selections.</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                {results.map((item) => (
+                {processedResults.map((item) => (
                   <MediaCard
                     key={item.id}
                     item={item}
-                    type={item.media_type || (activeTab === 'all' ? 'movie' : activeTab)}
+                    type={(item.media_type || (activeTab === 'all' ? 'movie' : activeTab)) as 'movie' | 'tv'}
                     isBookmarked={watchlistIds.includes(item.id)}
                     onBookmarkToggle={handleBookmarkToggle}
                   />

@@ -4,9 +4,10 @@ import { MediaCard } from '../../components/features/MediaCard.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiStarFill } from 'react-icons/ri';
+import { MediaItem } from '../../types/media.js';
 
 export default function TopIMDBPage() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<MediaItem[]>([]);
   const [activeTab, setActiveTab] = useState<'movie' | 'tv'>('movie');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export default function TopIMDBPage() {
           setItems(response.data.results || []);
           setTotalPages(Math.min(response.data.total_pages || 1, 100)); // limit top IMDb to first 100 pages
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching top IMDb items', err);
         setError('Failed to load top rated list. Please try again.');
       } finally {

@@ -47,8 +47,9 @@ const RegisterPage: React.FC = () => {
           navigate('/login');
         }, 2000);
       }
-    } catch (err: any) {
-      setErrorMsg(err.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setErrorMsg(axiosError.response?.data?.message || 'Registration failed. Please try again.');
       setSubmitting(false);
     }
   };
