@@ -4,14 +4,9 @@ import Layout from "./components/Layout/Layout";
 import NotFound from "./pages/PageNotFound/PageNotFound";
 import HomePage from "./pages/Homepage/HomePage";
 
-import axios from 'axios';
 import { configure } from 'axios-hooks';
 import LoginPage from "./pages/LoginPage/LoginPage";
-
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:3000/api/',
-  withCredentials: true,
-});
+import { api } from "./services/api.js";
 
 configure({ axios: api });
 

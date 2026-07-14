@@ -3,6 +3,7 @@ import validationRequest from "../validateRequest.js";
 import prisma from "../../config/db.js";
 import { RequestHandler } from "express";
 import bcrypt from "bcryptjs";
+import HttpError from "../../utils/httpError.js";
 
 
 const allowedFields = [
@@ -60,7 +61,7 @@ export const updateUserValidator = [
                 },
             })
             if (existingUser) {
-                throw new Error("Email already exists.");
+                throw new HttpError(409, "Email already exists.");
             }
             return true;
         }),
@@ -71,11 +72,11 @@ export const updateUserValidator = [
         .withMessage("Password must be at least 8 characters")
         .custom(async (password, { req }) => {
             if (password && !req.body.oldPassword) {
-                throw new Error("Old password is required to update password");
+                throw new HttpError(400, "Old password is required to update password");
             }
 
             if (password && !req.body.confirmPassword) {
-                throw new Error("confirm password is required to update password");
+                throw new HttpError(400, "confirm password is required to update password");
             }
             return true;
         }),
@@ -84,7 +85,7 @@ export const updateUserValidator = [
         .optional()
         .custom((confirmPassword, { req }) => {
             if (req.body.password && confirmPassword !== req.body.password) {
-                throw new Error("Passwords do not match");
+                throw new HttpError(400, "Passwords do not match");
             }
             return true;
         }),
@@ -94,7 +95,7 @@ export const updateUserValidator = [
         .custom(async (oldPassword, { req }) => {
             if (req.body.password) {
                 if (!oldPassword) {
-                    throw new Error("Old password is required");
+                    throw new HttpError(400, "Old password is required");
                 }
 
                 const user = await prisma.user.findUnique({
@@ -103,12 +104,12 @@ export const updateUserValidator = [
                 });
 
                 if (!user) {
-                    throw new Error("User not found");
+                    throw new HttpError(404, "User not found");
                 }
 
                 const isValid = await bcrypt.compare(oldPassword, user.passwordHash);
                 if (!isValid) {
-                    throw new Error("Old password is incorrect");
+                    throw new HttpError(401, "Old password is incorrect");
                 }
             }
             return true;

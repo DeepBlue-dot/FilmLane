@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import validationRequest from "../validateRequest.js";
 import prisma from "../../config/db.js";
+import HttpError from "../../utils/httpError.js";
 
 const mediaTypes = [
     "MOVIE",
@@ -15,8 +16,8 @@ export const addWatchHistoryItemValidator = [
         .withMessage("mediaType is required")
         .custom(
             async (value, { req }) => {
-                if (!mediaTypes.includes(value)) {
-                    throw Error("invalid mediaTypes")
+                    if (!mediaTypes.includes(value)) {
+                        throw new HttpError(400, "invalid mediaTypes");
                 }
                 return true;
 
@@ -40,7 +41,7 @@ export const addWatchHistoryItemValidator = [
                 })
 
                 if (existingItem) {
-                    throw new Error("Item already exists in watch history.");
+                    throw new HttpError(409, "Item already exists in watch history.");
                 }
                 return true;
 

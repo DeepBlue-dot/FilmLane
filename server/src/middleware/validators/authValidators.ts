@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import validationRequest from "../validateRequest.js";
 import prisma from "../../config/db.js";
+import HttpError from "../../utils/httpError.js";
 
 export const validateUserRegistration = [
     body("username")
@@ -25,7 +26,7 @@ export const validateUserRegistration = [
                 },
             })
             if (existingUser) {
-                throw new Error("Email already exists.");
+                throw new HttpError(409, "Email already exists.");
             }
             return true;
         }),

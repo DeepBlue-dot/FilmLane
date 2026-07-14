@@ -1,46 +1,40 @@
 import { Request, Response, NextFunction } from 'express';
-
-export interface HttpError extends Error {
-  statusCode?: number;
-  status?: string;
-  isOperational?: boolean;
-}
+import HttpError from '../utils/httpError.js';
 
 function unknownURL(req: Request, res: Response, next: NextFunction) {
-  const error = new Error(`Can't find ${req.originalUrl} on this server`) as HttpError;
-  error.statusCode = 404;
-  error.status = 'fail';
-  error.isOperational = true;
+  const error = new HttpError(404, `Can't find ${req.originalUrl} on this server`);
   next(error);
 }
 
-function errorHandler(err: HttpError, req: Request, res: Response, next: NextFunction) {
-  if (typeof err === 'string') {
-    err = new Error(err) as HttpError;
-    err.statusCode = 500;
-  } else if (!(err instanceof Error)) {
-    err = new Error('An unknown error occurred') as HttpError;
-    err.statusCode = 500;
+function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
+  let httpErr: HttpError;
+
+  if (err instanceof HttpError) {
+    httpErr = err;
+  } else if (err instanceof Error) {
+    httpErr = new HttpError(500, err.message);
+    // preserve stack
+    httpErr.stack = err.stack;
+  } else if (typeof err === 'string') {
+    httpErr = new HttpError(500, err);
+  } else {
+    httpErr = new HttpError(500, 'An unknown error occurred');
   }
 
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || (err.statusCode.toString().startsWith('4') ? 'fail' : 'error');
-  err.isOperational = err.isOperational || false;
-
-  if (err.statusCode.toString().startsWith('5')) {
-    console.error('🚨 ERROR', err);
+  if (String(httpErr.statusCode).startsWith('5')) {
+    console.error('🚨 ERROR', httpErr);
   }
 
   const errorResponse: Record<string, unknown> = {
-    status: err.status,
-    message: err.message
+    status: httpErr.status,
+    message: httpErr.message
   };
 
   if (process.env.NODE_ENV === 'development') {
-    errorResponse.stack = err.stack;
+    errorResponse.stack = httpErr.stack;
   }
 
-  res.status(err.statusCode).json(errorResponse);
+  res.status(httpErr.statusCode).json(errorResponse);
 }
 
 export { unknownURL, errorHandler };
