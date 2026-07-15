@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useWatchlist } from '../../hooks/useWatchlist.js';
+import { useAuth } from '../../context/AuthContext.js';
 import { MediaCarousel } from '../../components/features/MediaCarousel.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { Badge } from '../../components/ui/badge.js';
@@ -39,6 +40,32 @@ export default function TvDetailsPage() {
   const [episodesError, setEpisodesError] = useState<string | null>(null);
 
   const { watchlistIds, toggleWatchlist } = useWatchlist();
+  const { isAuthenticated } = useAuth();
+  const [lastWatched, setLastWatched] = useState<{ season: number; episode: number } | null>(null);
+
+  // Fetch watch history to check if the user has watched this series before
+  useEffect(() => {
+    const fetchWatchHistory = async () => {
+      if (!isAuthenticated || !tvId) return;
+      try {
+        const historyRes = await api.get('/users/me/watch-history');
+        const historyItems = historyRes.data?.data || [];
+        const matchingRecord = historyItems.find(
+          (item: any) => item.tmdbId === parseInt(tvId, 10) && item.mediaType === 'SERIES'
+        );
+        if (matchingRecord && matchingRecord.season !== null && matchingRecord.episode !== null) {
+          setLastWatched({
+            season: matchingRecord.season,
+            episode: matchingRecord.episode,
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching watch history in TV details', err);
+      }
+    };
+
+    fetchWatchHistory();
+  }, [tvId, isAuthenticated]);
 
   // Fetch Series Details
   useEffect(() => {
@@ -215,6 +242,15 @@ export default function TvDetailsPage() {
 
             {/* Actions */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+              {lastWatched && (
+                <Link
+                  to={`/tv/${series.id}/season/${lastWatched.season}/episode/${lastWatched.episode}`}
+                  className="inline-flex items-center gap-2 px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5 transition-all cursor-pointer text-base"
+                >
+                  <RiPlayFill className="w-5 h-5" />
+                  Resume S{lastWatched.season} E{lastWatched.episode}
+                </Link>
+              )}
               {seasonEpisodes.length > 0 && (
                 <Link
                   to={`/tv/${series.id}/season/${activeSeasonNum}/episode/1`}

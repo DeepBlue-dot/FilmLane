@@ -315,7 +315,6 @@ const NavBar: React.FC = () => {
                 {profileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl py-1.5 text-sm z-50 animate-fade-in">
                     <div className="px-4 py-2.5 border-b border-gray-800">
-                      <p className="text-xs text-gray-400">Signed in as</p>
                       <p className="font-semibold text-white truncate">{user?.username}</p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
