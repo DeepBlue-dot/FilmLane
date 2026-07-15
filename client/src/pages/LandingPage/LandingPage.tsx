@@ -44,26 +44,27 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-950 text-white relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-transparent text-white relative overflow-x-hidden">
       {/* Cinematic Poster Backdrop */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none -z-10 transition-opacity duration-1000">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.35),transparent_20%),radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.25),transparent_20%)] blur-3xl animate-glow-pulse" />
-        <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[110%] h-[110%] -translate-x-[5%] -translate-y-[5%] -rotate-2 animate-diagonal-scroll">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none select-none -z-10 transition-opacity duration-1000">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.92),transparent_12%),radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.85),transparent_12%)] blur-3xl animate-glow-pulse opacity-95 z-0" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/90 to-slate-900/90 z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.24),transparent_50%)] mix-blend-screen opacity-90 z-0" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.15)_35%,rgba(15,23,42,0.55)_100%)] z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.28),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.24),transparent_25%)] z-0" />
+        <div className="absolute inset-0 grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%] -rotate-2 animate-diagonal-scroll opacity-100 z-10">
           {Array.from({ length: 24 }).map((_, idx) => {
             const movie = trending.length > 0 ? trending[idx % trending.length] : null;
             const posterUrl = movie?.poster_path
               ? `https://image.tmdb.org/t/p/w185${movie.poster_path}`
               : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=185&auto=format&fit=crop';
             return (
-              <div key={idx} className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 border border-gray-800/40 shadow-xl shadow-indigo-500/20">
-                <img src={posterUrl} alt="" className="w-full h-full object-cover filter brightness-110 contrast-[1.05] saturate-150 opacity-95" />
+              <div key={idx} className="aspect-[2/3] rounded-3xl overflow-hidden border border-slate-600/80 shadow-[0_40px_160px_-120px_rgba(79,70,229,0.9)]">
+                <img src={posterUrl} alt="" className="w-full h-full object-cover filter brightness-130 contrast-130 saturate-150" />
               </div>
             );
           })}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/20 via-gray-950/10 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_65%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_35%)]" />
       </div>
 
       {/* Navigation Header */}

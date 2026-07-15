@@ -116,36 +116,18 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
 export const NullsOrder = {
   first: 'first',
   last: 'last'
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
-export const UserOrderByRelevanceFieldEnum = {
-  id: 'id',
-  email: 'email',
-  passwordHash: 'passwordHash',
-  username: 'username'
-} as const
-
-export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
-
-
-export const WatchHistoryOrderByRelevanceFieldEnum = {
-  id: 'id',
-  userId: 'userId'
-} as const
-
-export type WatchHistoryOrderByRelevanceFieldEnum = (typeof WatchHistoryOrderByRelevanceFieldEnum)[keyof typeof WatchHistoryOrderByRelevanceFieldEnum]
-
-
-export const WatchlistItemOrderByRelevanceFieldEnum = {
-  id: 'id',
-  userId: 'userId'
-} as const
-
-export type WatchlistItemOrderByRelevanceFieldEnum = (typeof WatchlistItemOrderByRelevanceFieldEnum)[keyof typeof WatchlistItemOrderByRelevanceFieldEnum]
 

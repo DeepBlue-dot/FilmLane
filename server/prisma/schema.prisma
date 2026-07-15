@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 model User {
@@ -12,8 +12,8 @@ model User {
   email         String          @unique(map: "email") @db.VarChar(255)
   passwordHash  String          @db.VarChar(255)
   username      String          @db.VarChar(50)
-  createdAt     DateTime?       @default(now()) @db.DateTime(0)
-  updatedAt     DateTime?       @default(now()) @db.DateTime(0)
+  createdAt     DateTime?       @default(now()) @db.Timestamp(0)
+  updatedAt     DateTime?       @default(now()) @db.Timestamp(0)
   WatchHistory  WatchHistory[]
   WatchlistItem WatchlistItem[]
 }
@@ -25,10 +25,10 @@ model WatchHistory {
   mediaType MediaType
   season    Int?
   episode   Int?
-  watchedAt DateTime? @default(now()) @db.DateTime(0)
+  watchedAt DateTime? @default(now()) @db.Timestamp(0)
   User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], map: "WatchHistory_userId_fkey")
+  @@index([userId], map: "idx_WatchHistory_userId")
 }
 
 model WatchlistItem {
@@ -36,7 +36,7 @@ model WatchlistItem {
   userId    String    @db.Char(36)
   tmdbId    Int
   mediaType MediaType
-  addedAt   DateTime? @default(now()) @db.DateTime(0)
+  addedAt   DateTime? @default(now()) @db.Timestamp(0)
   User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tmdbId, mediaType], map: "unique_watchlist")

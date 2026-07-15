@@ -252,7 +252,6 @@ export type WatchHistoryOrderByWithRelationInput = {
   episode?: Prisma.SortOrderInput | Prisma.SortOrder
   watchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   User?: Prisma.UserOrderByWithRelationInput
-  _relevance?: Prisma.WatchHistoryOrderByRelevanceInput
 }
 
 export type WatchHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -374,12 +373,6 @@ export type WatchHistoryListRelationFilter = {
 
 export type WatchHistoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type WatchHistoryOrderByRelevanceInput = {
-  fields: Prisma.WatchHistoryOrderByRelevanceFieldEnum | Prisma.WatchHistoryOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type WatchHistoryCountOrderByAggregateInput = {
@@ -592,7 +585,27 @@ export type WatchHistorySelect<ExtArgs extends runtime.Types.Extensions.Internal
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchHistory"]>
 
+export type WatchHistorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  tmdbId?: boolean
+  mediaType?: boolean
+  season?: boolean
+  episode?: boolean
+  watchedAt?: boolean
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["watchHistory"]>
 
+export type WatchHistorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  tmdbId?: boolean
+  mediaType?: boolean
+  season?: boolean
+  episode?: boolean
+  watchedAt?: boolean
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["watchHistory"]>
 
 export type WatchHistorySelectScalar = {
   id?: boolean
@@ -606,6 +619,12 @@ export type WatchHistorySelectScalar = {
 
 export type WatchHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tmdbId" | "mediaType" | "season" | "episode" | "watchedAt", ExtArgs["result"]["watchHistory"]>
 export type WatchHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type WatchHistoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type WatchHistoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -740,6 +759,30 @@ export interface WatchHistoryDelegate<ExtArgs extends runtime.Types.Extensions.I
   createMany<T extends WatchHistoryCreateManyArgs>(args?: Prisma.SelectSubset<T, WatchHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many WatchHistories and returns the data saved in the database.
+   * @param {WatchHistoryCreateManyAndReturnArgs} args - Arguments to create many WatchHistories.
+   * @example
+   * // Create many WatchHistories
+   * const watchHistory = await prisma.watchHistory.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many WatchHistories and only return the `id`
+   * const watchHistoryWithIdOnly = await prisma.watchHistory.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends WatchHistoryCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, WatchHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchHistoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a WatchHistory.
    * @param {WatchHistoryDeleteArgs} args - Arguments to delete one WatchHistory.
    * @example
@@ -802,6 +845,36 @@ export interface WatchHistoryDelegate<ExtArgs extends runtime.Types.Extensions.I
    * 
    */
   updateMany<T extends WatchHistoryUpdateManyArgs>(args: Prisma.SelectSubset<T, WatchHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more WatchHistories and returns the data updated in the database.
+   * @param {WatchHistoryUpdateManyAndReturnArgs} args - Arguments to update many WatchHistories.
+   * @example
+   * // Update many WatchHistories
+   * const watchHistory = await prisma.watchHistory.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more WatchHistories and only return the `id`
+   * const watchHistoryWithIdOnly = await prisma.watchHistory.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends WatchHistoryUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, WatchHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchHistoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one WatchHistory.
@@ -1237,6 +1310,29 @@ export type WatchHistoryCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 /**
+ * WatchHistory createManyAndReturn
+ */
+export type WatchHistoryCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WatchHistory
+   */
+  select?: Prisma.WatchHistorySelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the WatchHistory
+   */
+  omit?: Prisma.WatchHistoryOmit<ExtArgs> | null
+  /**
+   * The data used to create many WatchHistories.
+   */
+  data: Prisma.WatchHistoryCreateManyInput | Prisma.WatchHistoryCreateManyInput[]
+  skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchHistoryIncludeCreateManyAndReturn<ExtArgs> | null
+}
+
+/**
  * WatchHistory update
  */
 export type WatchHistoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1278,6 +1374,36 @@ export type WatchHistoryUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many WatchHistories to update.
    */
   limit?: number
+}
+
+/**
+ * WatchHistory updateManyAndReturn
+ */
+export type WatchHistoryUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WatchHistory
+   */
+  select?: Prisma.WatchHistorySelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the WatchHistory
+   */
+  omit?: Prisma.WatchHistoryOmit<ExtArgs> | null
+  /**
+   * The data used to update WatchHistories.
+   */
+  data: Prisma.XOR<Prisma.WatchHistoryUpdateManyMutationInput, Prisma.WatchHistoryUncheckedUpdateManyInput>
+  /**
+   * Filter which WatchHistories to update
+   */
+  where?: Prisma.WatchHistoryWhereInput
+  /**
+   * Limit how many WatchHistories to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchHistoryIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

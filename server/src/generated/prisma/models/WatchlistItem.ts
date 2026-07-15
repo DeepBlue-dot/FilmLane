@@ -226,7 +226,6 @@ export type WatchlistItemOrderByWithRelationInput = {
   mediaType?: Prisma.SortOrder
   addedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   User?: Prisma.UserOrderByWithRelationInput
-  _relevance?: Prisma.WatchlistItemOrderByRelevanceInput
 }
 
 export type WatchlistItemWhereUniqueInput = Prisma.AtLeast<{
@@ -329,12 +328,6 @@ export type WatchlistItemListRelationFilter = {
 
 export type WatchlistItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
-}
-
-export type WatchlistItemOrderByRelevanceInput = {
-  fields: Prisma.WatchlistItemOrderByRelevanceFieldEnum | Prisma.WatchlistItemOrderByRelevanceFieldEnum[]
-  sort: Prisma.SortOrder
-  search: string
 }
 
 export type WatchlistItemUserIdTmdbIdMediaTypeCompoundUniqueInput = {
@@ -507,7 +500,23 @@ export type WatchlistItemSelect<ExtArgs extends runtime.Types.Extensions.Interna
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchlistItem"]>
 
+export type WatchlistItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  tmdbId?: boolean
+  mediaType?: boolean
+  addedAt?: boolean
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["watchlistItem"]>
 
+export type WatchlistItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  userId?: boolean
+  tmdbId?: boolean
+  mediaType?: boolean
+  addedAt?: boolean
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["watchlistItem"]>
 
 export type WatchlistItemSelectScalar = {
   id?: boolean
@@ -519,6 +528,12 @@ export type WatchlistItemSelectScalar = {
 
 export type WatchlistItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tmdbId" | "mediaType" | "addedAt", ExtArgs["result"]["watchlistItem"]>
 export type WatchlistItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type WatchlistItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type WatchlistItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -651,6 +666,30 @@ export interface WatchlistItemDelegate<ExtArgs extends runtime.Types.Extensions.
   createMany<T extends WatchlistItemCreateManyArgs>(args?: Prisma.SelectSubset<T, WatchlistItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
 
   /**
+   * Create many WatchlistItems and returns the data saved in the database.
+   * @param {WatchlistItemCreateManyAndReturnArgs} args - Arguments to create many WatchlistItems.
+   * @example
+   * // Create many WatchlistItems
+   * const watchlistItem = await prisma.watchlistItem.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many WatchlistItems and only return the `id`
+   * const watchlistItemWithIdOnly = await prisma.watchlistItem.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends WatchlistItemCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, WatchlistItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchlistItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+  /**
    * Delete a WatchlistItem.
    * @param {WatchlistItemDeleteArgs} args - Arguments to delete one WatchlistItem.
    * @example
@@ -713,6 +752,36 @@ export interface WatchlistItemDelegate<ExtArgs extends runtime.Types.Extensions.
    * 
    */
   updateMany<T extends WatchlistItemUpdateManyArgs>(args: Prisma.SelectSubset<T, WatchlistItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Update zero or more WatchlistItems and returns the data updated in the database.
+   * @param {WatchlistItemUpdateManyAndReturnArgs} args - Arguments to update many WatchlistItems.
+   * @example
+   * // Update many WatchlistItems
+   * const watchlistItem = await prisma.watchlistItem.updateManyAndReturn({
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Update zero or more WatchlistItems and only return the `id`
+   * const watchlistItemWithIdOnly = await prisma.watchlistItem.updateManyAndReturn({
+   *   select: { id: true },
+   *   where: {
+   *     // ... provide filter here
+   *   },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  updateManyAndReturn<T extends WatchlistItemUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, WatchlistItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchlistItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Create or update one WatchlistItem.
@@ -1146,6 +1215,29 @@ export type WatchlistItemCreateManyArgs<ExtArgs extends runtime.Types.Extensions
 }
 
 /**
+ * WatchlistItem createManyAndReturn
+ */
+export type WatchlistItemCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WatchlistItem
+   */
+  select?: Prisma.WatchlistItemSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the WatchlistItem
+   */
+  omit?: Prisma.WatchlistItemOmit<ExtArgs> | null
+  /**
+   * The data used to create many WatchlistItems.
+   */
+  data: Prisma.WatchlistItemCreateManyInput | Prisma.WatchlistItemCreateManyInput[]
+  skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchlistItemIncludeCreateManyAndReturn<ExtArgs> | null
+}
+
+/**
  * WatchlistItem update
  */
 export type WatchlistItemUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1187,6 +1279,36 @@ export type WatchlistItemUpdateManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many WatchlistItems to update.
    */
   limit?: number
+}
+
+/**
+ * WatchlistItem updateManyAndReturn
+ */
+export type WatchlistItemUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WatchlistItem
+   */
+  select?: Prisma.WatchlistItemSelectUpdateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the WatchlistItem
+   */
+  omit?: Prisma.WatchlistItemOmit<ExtArgs> | null
+  /**
+   * The data used to update WatchlistItems.
+   */
+  data: Prisma.XOR<Prisma.WatchlistItemUpdateManyMutationInput, Prisma.WatchlistItemUncheckedUpdateManyInput>
+  /**
+   * Filter which WatchlistItems to update
+   */
+  where?: Prisma.WatchlistItemWhereInput
+  /**
+   * Limit how many WatchlistItems to update.
+   */
+  limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchlistItemIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

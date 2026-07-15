@@ -29,7 +29,7 @@ export default function App() {
         <div className="fixed top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-indigo-600/10 blur-[130px] pointer-events-none z-0 animate-orb1" />
         <div className="fixed bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-pink-600/5 blur-[130px] pointer-events-none z-0 animate-orb2" />
 
-        <div className="relative z-10 min-h-screen flex flex-col">
+        <div className="relative min-h-screen flex flex-col">
           <BrowserRouter>
             <Routes>
               {/* Public-only routes (unauthenticated users only) */}
