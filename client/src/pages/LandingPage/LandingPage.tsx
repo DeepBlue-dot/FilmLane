@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../../components/NavBar/NavBar.js';
 import Footer from '../../components/Footer/Footer.js';
 import { api } from '../../services/api.js';
-import { RiMovie2Line, RiSearchLine, RiArrowRightUpLine, RiStarFill, RiCompassLine, RiStackLine, RiHistoryLine, RiPlayFill } from 'react-icons/ri';
+import { RiMovie2Line, RiSearchLine, RiArrowRightUpLine, RiStarFill, RiPlayFill } from 'react-icons/ri';
 
 interface TrendingMovie {
   id: number;
