@@ -1,1 +1,3 @@
 add omdbapi as a backup
+add history and wachtlist to homepage
+improve history and wachtlist page 
