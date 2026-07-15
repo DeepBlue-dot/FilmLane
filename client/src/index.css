@@ -99,3 +99,16 @@ body {
 .animate-diagonal-scroll {
   animation: diagonalScroll 50s linear infinite alternate;
 }
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.16;
+  }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 18s ease-in-out infinite;
+}

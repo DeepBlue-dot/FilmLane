@@ -46,22 +46,24 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-white relative overflow-x-hidden">
       {/* Cinematic Poster Backdrop */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.08] transition-opacity duration-1000">
-        <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[110%] h-[110%] -translate-x-[5%] -translate-y-[5%] -rotate-2">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none -z-10 transition-opacity duration-1000">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.35),transparent_20%),radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.25),transparent_20%)] blur-3xl animate-glow-pulse" />
+        <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[110%] h-[110%] -translate-x-[5%] -translate-y-[5%] -rotate-2 animate-diagonal-scroll">
           {Array.from({ length: 24 }).map((_, idx) => {
             const movie = trending.length > 0 ? trending[idx % trending.length] : null;
             const posterUrl = movie?.poster_path
               ? `https://image.tmdb.org/t/p/w185${movie.poster_path}`
               : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=185&auto=format&fit=crop';
             return (
-              <div key={idx} className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 border border-gray-800/40">
-                <img src={posterUrl} alt="" className="w-full h-full object-cover filter grayscale opacity-60" />
+              <div key={idx} className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 border border-gray-800/40 shadow-xl shadow-indigo-500/20">
+                <img src={posterUrl} alt="" className="w-full h-full object-cover filter brightness-110 contrast-[1.05] saturate-150 opacity-95" />
               </div>
             );
           })}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/85 to-gray-950"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.15),transparent_70%)]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/20 via-gray-950/10 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.14),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.14),transparent_35%)]" />
       </div>
 
       {/* Navigation Header */}
@@ -194,52 +196,6 @@ export default function LandingPage() {
           )}
         </section>
 
-        {/* 3. Features Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-3 mb-16">
-            <h2 className="text-3xl font-extrabold text-white">
-              The Complete Media Dashboard
-            </h2>
-            <p className="text-sm text-gray-400 max-w-xl mx-auto">
-              Curate your watching experience with premium styling, modern controls, and comprehensive tracking features.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1 */}
-            <div className="bg-gray-900/40 border border-gray-900/60 rounded-3xl p-8 backdrop-blur-sm shadow-xl flex flex-col items-center text-center space-y-4 hover:border-indigo-500/20 transition-all group">
-              <div className="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl group-hover:scale-110 transition-transform">
-                <RiCompassLine className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Explore & Discover</h3>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Filter and sort through thousands of titles. Fetch detailed cast lists, reviews, high-res posters, and upcoming recommendations.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="bg-gray-900/40 border border-gray-900/60 rounded-3xl p-8 backdrop-blur-sm shadow-xl flex flex-col items-center text-center space-y-4 hover:border-indigo-500/20 transition-all group">
-              <div className="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl group-hover:scale-110 transition-transform">
-                <RiStackLine className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Watchlists</h3>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Add, manage, and query your watchlist items. Everything is synced to your profile, accessible from any browser at any time.
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="bg-gray-900/40 border border-gray-900/60 rounded-3xl p-8 backdrop-blur-sm shadow-xl flex flex-col items-center text-center space-y-4 hover:border-indigo-500/20 transition-all group">
-              <div className="p-4 bg-indigo-600/10 text-indigo-400 rounded-2xl group-hover:scale-110 transition-transform">
-                <RiHistoryLine className="w-7 h-7" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Detailed Playback Logs</h3>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Track what you watched down to the season and episode. Auto-record logs as soon as you press play.
-              </p>
-            </div>
-          </div>
-        </section>
 
       </main>
 
