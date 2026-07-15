@@ -155,6 +155,8 @@ describe('watchHistoryControllers (unit)', () => {
           tmdbId: 303,
           userId: 'u1',
           mediaType: 'MOVIE',
+          season: null,
+          episode: null,
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);

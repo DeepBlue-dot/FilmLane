@@ -52,7 +52,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.24),transparent_50%)] mix-blend-screen opacity-90 z-0" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.15)_35%,rgba(15,23,42,0.55)_100%)] z-0" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.28),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.24),transparent_25%)] z-0" />
-        <div className="absolute inset-0 grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%] -rotate-2 animate-diagonal-scroll opacity-100 z-10">
+        <div className="absolute inset-0 grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%] -rotate-2 animate-diagonal-scroll opacity-[0.12] z-10">
           {Array.from({ length: 24 }).map((_, idx) => {
             const movie = trending.length > 0 ? trending[idx % trending.length] : null;
             const posterUrl = movie?.poster_path

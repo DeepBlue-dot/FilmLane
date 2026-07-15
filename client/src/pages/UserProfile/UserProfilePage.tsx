@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext.js';
 import { useWatchlist, WatchlistItem } from '../../hooks/useWatchlist.js';
 import { MediaCard } from '../../components/features/MediaCard.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
-import { RiUser3Line, RiHeartLine, RiHistoryLine, RiSettings4Line, RiLockPasswordLine, RiDeleteBin5Line, RiTimeLine } from 'react-icons/ri';
+import { RiUser3Line, RiHeartLine, RiHistoryLine, RiSettings4Line, RiLockPasswordLine, RiDeleteBin5Line, RiTimeLine, RiSearchLine, RiPlayFill } from 'react-icons/ri';
 
 interface WatchlistDetailedItem extends WatchlistItem {
   media: {
@@ -63,6 +63,27 @@ export default function UserProfilePage() {
   // History state
   const [historyList, setHistoryList] = useState<HistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Watchlist filtering & sorting
+  const [watchlistSearch, setWatchlistSearch] = useState('');
+  const [watchlistTypeFilter, setWatchlistTypeFilter] = useState<'ALL' | 'MOVIE' | 'SERIES'>('ALL');
+  const [watchlistSort, setWatchlistSort] = useState<'addedAt_desc' | 'title_asc' | 'rating_desc'>('addedAt_desc');
+  const [watchlistPage, setWatchlistPage] = useState(1);
+
+  // History filtering & sorting
+  const [historySearch, setHistorySearch] = useState('');
+  const [historyTypeFilter, setHistoryTypeFilter] = useState<'ALL' | 'MOVIE' | 'SERIES'>('ALL');
+  const [historySort, setHistorySort] = useState<'watchedAt_desc' | 'watchedAt_asc'>('watchedAt_desc');
+  const [historyPage, setHistoryPage] = useState(1);
+
+  // Reset page numbers to 1 when filters or sort change
+  useEffect(() => {
+    setWatchlistPage(1);
+  }, [watchlistSearch, watchlistTypeFilter, watchlistSort]);
+
+  useEffect(() => {
+    setHistoryPage(1);
+  }, [historySearch, historyTypeFilter, historySort]);
 
   // Sync username on user mount
   useEffect(() => {
@@ -268,6 +289,66 @@ export default function UserProfilePage() {
     });
   };
 
+  const filteredWatchlist = watchlistItems
+    .filter((item) => {
+      const title = (item.media.title || item.media.name || '').toLowerCase();
+      const matchesSearch = title.includes(watchlistSearch.toLowerCase());
+      const matchesType = watchlistTypeFilter === 'ALL' || item.mediaType === watchlistTypeFilter;
+      return matchesSearch && matchesType;
+    })
+    .sort((a, b) => {
+      if (watchlistSort === 'addedAt_desc') {
+        return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
+      }
+      if (watchlistSort === 'title_asc') {
+        const titleA = a.media.title || a.media.name || '';
+        const titleB = b.media.title || b.media.name || '';
+        return titleA.localeCompare(titleB);
+      }
+      if (watchlistSort === 'rating_desc') {
+        return (b.media.vote_average || 0) - (a.media.vote_average || 0);
+      }
+      return 0;
+    });
+
+  // Deduplicate history items by tmdbId, keeping the most recently watched entry
+  const sortedRawHistory = [...historyList].sort(
+    (a, b) => new Date(b.watchedAt).getTime() - new Date(a.watchedAt).getTime()
+  );
+  const uniqueHistoryList = sortedRawHistory.filter(
+    (item, index, self) => self.findIndex((t) => t.tmdbId === item.tmdbId) === index
+  );
+
+  const filteredHistory = uniqueHistoryList
+    .filter((item) => {
+      const title = (item.media.title || item.media.name || '').toLowerCase();
+      const matchesSearch = title.includes(historySearch.toLowerCase());
+      const matchesType =
+        historyTypeFilter === 'ALL' ||
+        (historyTypeFilter === 'MOVIE' && item.mediaType === 'MOVIE') ||
+        (historyTypeFilter === 'SERIES' && item.mediaType !== 'MOVIE');
+      return matchesSearch && matchesType;
+    })
+    .sort((a, b) => {
+      const timeA = new Date(a.watchedAt).getTime();
+      const timeB = new Date(b.watchedAt).getTime();
+      return historySort === 'watchedAt_desc' ? timeB - timeA : timeA - timeB;
+    });
+
+  const WATCHLIST_PAGE_SIZE = 8;
+  const watchlistTotalPages = Math.ceil(filteredWatchlist.length / WATCHLIST_PAGE_SIZE);
+  const paginatedWatchlist = filteredWatchlist.slice(
+    (watchlistPage - 1) * WATCHLIST_PAGE_SIZE,
+    watchlistPage * WATCHLIST_PAGE_SIZE
+  );
+
+  const HISTORY_PAGE_SIZE = 8;
+  const historyTotalPages = Math.ceil(filteredHistory.length / HISTORY_PAGE_SIZE);
+  const paginatedHistory = filteredHistory.slice(
+    (historyPage - 1) * HISTORY_PAGE_SIZE,
+    historyPage * HISTORY_PAGE_SIZE
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -463,10 +544,17 @@ export default function UserProfilePage() {
           {/* TAB 2: MY WATCHLIST */}
           {activeTab === 'watchlist' && (
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2 border-b border-gray-900 pb-3">
-                <RiHeartLine className="text-indigo-400 w-6 h-6" />
-                My Watchlist
-              </h3>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-900 pb-3 gap-2">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <RiHeartLine className="text-indigo-400 w-6 h-6" />
+                  My Watchlist
+                </h3>
+                {!watchlistItemsLoading && watchlistItems.length > 0 && (
+                  <span className="text-xs text-gray-500 font-semibold bg-gray-900/60 border border-gray-850 px-2.5 py-1 rounded-lg">
+                    {filteredWatchlist.length} {filteredWatchlist.length === 1 ? 'title' : 'titles'}
+                  </span>
+                )}
+              </div>
 
               {watchlistItemsLoading ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -486,16 +574,84 @@ export default function UserProfilePage() {
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {watchlistItems.map((item) => (
-                    <MediaCard
-                      key={item.id}
-                      item={item.media}
-                      type={item.mediaType === 'MOVIE' ? 'movie' : 'tv'}
-                      isBookmarked={watchlistIds.includes(item.media.id)}
-                      onBookmarkToggle={handleBookmarkToggle}
-                    />
-                  ))}
+                <div className="space-y-6">
+                  {/* Search, Filter, Sort Controls */}
+                  <div className="flex flex-col md:flex-row gap-3 bg-gray-900/30 p-3 rounded-xl border border-gray-850/60 shadow-inner">
+                    <div className="relative flex-1">
+                      <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                      <input
+                        type="text"
+                        placeholder="Search watchlist..."
+                        value={watchlistSearch}
+                        onChange={(e) => setWatchlistSearch(e.target.value)}
+                        className="w-full bg-gray-950 border border-gray-850 rounded-lg pl-9 pr-4 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      />
+                    </div>
+                    <div className="flex gap-2.5">
+                      <select
+                        value={watchlistTypeFilter}
+                        onChange={(e) => setWatchlistTypeFilter(e.target.value as any)}
+                        className="bg-gray-950 border border-gray-850 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      >
+                        <option value="ALL">All Formats</option>
+                        <option value="MOVIE">Movies</option>
+                        <option value="SERIES">TV Shows</option>
+                      </select>
+                      <select
+                        value={watchlistSort}
+                        onChange={(e) => setWatchlistSort(e.target.value as any)}
+                        className="bg-gray-950 border border-gray-850 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      >
+                        <option value="addedAt_desc">Recently Added</option>
+                        <option value="title_asc">Title (A-Z)</option>
+                        <option value="rating_desc">Rating (High-Low)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {filteredWatchlist.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500 bg-gray-900/5 border border-dashed border-gray-850 rounded-xl">
+                      <p className="font-semibold text-gray-400">No matching titles found</p>
+                      <p className="text-xs mt-1">Try adjusting your search query or format filters.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {paginatedWatchlist.map((item) => (
+                          <MediaCard
+                            key={item.id}
+                            item={item.media}
+                            type={item.mediaType === 'MOVIE' ? 'movie' : 'tv'}
+                            isBookmarked={watchlistIds.includes(item.media.id)}
+                            onBookmarkToggle={handleBookmarkToggle}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Pagination Controls */}
+                      {watchlistTotalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-8 pt-4 border-t border-gray-900">
+                          <button
+                            disabled={watchlistPage === 1}
+                            onClick={() => setWatchlistPage((prev) => prev - 1)}
+                            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Previous
+                          </button>
+                          <span className="text-xs text-gray-400 font-semibold px-4">
+                            Page {watchlistPage} of {watchlistTotalPages}
+                          </span>
+                          <button
+                            disabled={watchlistPage === watchlistTotalPages}
+                            onClick={() => setWatchlistPage((prev) => prev + 1)}
+                            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -509,15 +665,17 @@ export default function UserProfilePage() {
                   <RiHistoryLine className="text-indigo-400 w-6 h-6" />
                   Watch History
                 </h3>
-                {historyList.length > 0 && !historyLoading && (
-                  <button
-                    onClick={handleClearHistory}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-950/60 border border-red-900/30 hover:border-red-900/50 text-red-400 text-xs font-semibold rounded-lg transition-all cursor-pointer"
-                  >
-                    <RiDeleteBin5Line className="w-3.5 h-3.5" />
-                    Clear All
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  {historyList.length > 0 && !historyLoading && (
+                    <button
+                      onClick={handleClearHistory}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-950/40 hover:bg-red-950/60 border border-red-900/30 hover:border-red-900/50 text-red-400 text-xs font-semibold rounded-lg transition-all cursor-pointer"
+                    >
+                      <RiDeleteBin5Line className="w-3.5 h-3.5" />
+                      Clear All
+                    </button>
+                  )}
+                </div>
               </div>
 
               {historyLoading ? (
@@ -538,68 +696,144 @@ export default function UserProfilePage() {
                   <p className="text-xs mt-1">Media you watch will be automatically saved here for quick resume.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {historyList.map((item) => {
-                    const title = item.media.title || item.media.name || 'Untitled';
-                    const isMovie = item.mediaType === 'MOVIE';
-                    const detailPath = isMovie ? `/movies/${item.tmdbId}` : `/tv/${item.tmdbId}`;
-                    const playPath = isMovie
-                      ? `/movies/${item.tmdbId}/play`
-                      : (item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined)
-                        ? `/tv/${item.tmdbId}/season/${item.season}/episode/${item.episode}`
-                        : `/tv/${item.tmdbId}`;
-                    const thumbUrl = item.media.backdrop_path
-                      ? `https://image.tmdb.org/t/p/w300${item.media.backdrop_path}`
-                      : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop';
+                <div className="space-y-6">
+                  {/* Search, Filter, Sort Controls */}
+                  <div className="flex flex-col md:flex-row gap-3 bg-gray-900/30 p-3 rounded-xl border border-gray-850/60 shadow-inner">
+                    <div className="relative flex-1">
+                      <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+                      <input
+                        type="text"
+                        placeholder="Search watch history..."
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        className="w-full bg-gray-950 border border-gray-850 rounded-lg pl-9 pr-4 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      />
+                    </div>
+                    <div className="flex gap-2.5">
+                      <select
+                        value={historyTypeFilter}
+                        onChange={(e) => setHistoryTypeFilter(e.target.value as any)}
+                        className="bg-gray-950 border border-gray-850 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      >
+                        <option value="ALL">All Formats</option>
+                        <option value="MOVIE">Movies</option>
+                        <option value="SERIES">TV Shows</option>
+                      </select>
+                      <select
+                        value={historySort}
+                        onChange={(e) => setHistorySort(e.target.value as any)}
+                        className="bg-gray-950 border border-gray-850 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                      >
+                        <option value="watchedAt_desc">Recently Watched</option>
+                        <option value="watchedAt_asc">Oldest Watched</option>
+                      </select>
+                    </div>
+                  </div>
 
-                    return (
-                      <div key={item.id} className="flex items-center justify-between gap-4 p-4 bg-gray-900/20 border border-gray-850/60 rounded-xl hover:border-gray-800 hover:bg-gray-900/30 transition-all group">
-                        <div className="flex items-center gap-4 min-w-0">
-                          {/* Thumbnail */}
-                          <div className="w-24 aspect-video rounded-lg overflow-hidden shrink-0 bg-gray-950 border border-gray-850">
-                            <img src={thumbUrl} alt={title} className="w-full h-full object-cover" />
-                          </div>
+                  {filteredHistory.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500 bg-gray-900/5 border border-dashed border-gray-850 rounded-xl">
+                      <p className="font-semibold text-gray-400">No matching history found</p>
+                      <p className="text-xs mt-1">Try adjusting your search query or format filters.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        {paginatedHistory.map((item) => {
+                          const title = item.media.title || item.media.name || 'Untitled';
+                          const isMovie = item.mediaType === 'MOVIE';
+                          const detailPath = isMovie ? `/movies/${item.tmdbId}` : `/tv/${item.tmdbId}`;
+                          const playPath = isMovie
+                            ? `/movies/${item.tmdbId}/play`
+                            : (item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined)
+                              ? `/tv/${item.tmdbId}/season/${item.season}/episode/${item.episode}`
+                              : `/tv/${item.tmdbId}`;
+                          const thumbUrl = item.media.backdrop_path
+                            ? `https://image.tmdb.org/t/p/w300${item.media.backdrop_path}`
+                            : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop';
 
-                          <div className="min-w-0 text-left">
-                            <Link to={detailPath} className="text-sm font-bold text-white hover:text-indigo-400 transition-colors truncate block">
-                              {title}
-                            </Link>
-                            <div className="flex items-center gap-2 flex-wrap mt-1">
-                              <span className="inline-block text-[10px] uppercase font-bold text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
-                                {isMovie ? 'Movie' : 'TV Show'}
-                              </span>
-                              {!isMovie && item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined && (
-                                <span className="inline-block text-[10px] uppercase font-bold text-indigo-300 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
-                                  S{item.season} E{item.episode}
-                                </span>
-                              )}
+                          return (
+                            <div
+                              key={item.id}
+                              className="flex items-center justify-between gap-4 p-4 bg-gray-900/20 border border-gray-850/60 rounded-xl hover:border-gray-800 hover:bg-gray-900/30 hover:shadow-indigo-500/5 transition-all group"
+                            >
+                              <div className="flex items-center gap-4 min-w-0">
+                                {/* Thumbnail */}
+                                <div className="w-24 aspect-video rounded-lg overflow-hidden shrink-0 bg-gray-950 border border-gray-850 relative group-hover:border-gray-700 transition-colors">
+                                  <img src={thumbUrl} alt={title} className="w-full h-full object-cover" />
+                                  <div className="absolute inset-0 bg-gray-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <Link to={playPath} className="p-1.5 rounded-full bg-indigo-600 text-white shadow">
+                                      <RiPlayFill className="w-3.5 h-3.5" />
+                                    </Link>
+                                  </div>
+                                </div>
+
+                                <div className="min-w-0 text-left">
+                                  <Link to={detailPath} className="text-sm font-bold text-white hover:text-indigo-400 transition-colors truncate block">
+                                    {title}
+                                  </Link>
+                                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                                    <span className="inline-block text-[10px] uppercase font-bold text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
+                                      {isMovie ? 'Movie' : 'TV Show'}
+                                    </span>
+                                    {!isMovie && item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined && (
+                                      <span className="inline-block text-[10px] uppercase font-bold text-indigo-300 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
+                                        S{item.season} E{item.episode}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-1.5 text-gray-500 text-xs">
+                                    <RiTimeLine className="w-3.5 h-3.5" />
+                                    <span>Watched on {formatDate(item.watchedAt)}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action buttons */}
+                              <div className="flex items-center gap-2">
+                                <Link
+                                  to={playPath}
+                                  className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition-all shadow-md cursor-pointer flex items-center gap-1"
+                                >
+                                  <RiPlayFill className="w-3.5 h-3.5" />
+                                  Resume
+                                </Link>
+                                <button
+                                  onClick={() => handleDeleteHistoryItem(item.id)}
+                                  className="p-2 text-gray-400 hover:text-red-400 bg-gray-950 border border-gray-850 hover:border-red-900/30 hover:bg-red-950/15 rounded-lg transition-colors cursor-pointer"
+                                  title="Remove from history"
+                                >
+                                  <RiDeleteBin5Line className="w-4 h-4" />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1 mt-1.5 text-gray-500 text-xs">
-                              <RiTimeLine className="w-3.5 h-3.5" />
-                              <span>Watched on {formatDate(item.watchedAt)}</span>
-                            </div>
-                          </div>
-                        </div>
+                          );
+                        })}
+                      </div>
 
-                        {/* Action buttons */}
-                        <div className="flex items-center gap-2">
-                          <Link
-                            to={playPath}
-                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition-all shadow-md cursor-pointer"
-                          >
-                            Resume
-                          </Link>
+                      {/* Pagination Controls */}
+                      {historyTotalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-8 pt-4 border-t border-gray-900">
                           <button
-                            onClick={() => handleDeleteHistoryItem(item.id)}
-                            className="p-2 text-gray-400 hover:text-red-400 bg-gray-950 border border-gray-850 hover:border-red-900/30 hover:bg-red-950/15 rounded-lg transition-colors cursor-pointer"
-                            title="Remove from history"
+                            disabled={historyPage === 1}
+                            onClick={() => setHistoryPage((prev) => prev - 1)}
+                            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold transition-all cursor-pointer"
                           >
-                            <RiDeleteBin5Line className="w-4 h-4" />
+                            Previous
+                          </button>
+                          <span className="text-xs text-gray-400 font-semibold px-4">
+                            Page {historyPage} of {historyTotalPages}
+                          </span>
+                          <button
+                            disabled={historyPage === historyTotalPages}
+                            onClick={() => setHistoryPage((prev) => prev + 1)}
+                            className="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-800 disabled:opacity-40 disabled:pointer-events-none text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Next
                           </button>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

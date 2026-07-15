@@ -84,13 +84,13 @@ export default function MoviePlayPage() {
     <div className="min-h-screen max-h-screen h-screen overflow-hidden bg-gray-950 text-white flex flex-col justify-between select-none relative">
       {/* Blurred Backdrop image for immersive atmosphere */}
       {backdropUrl && (
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <img 
             src={backdropUrl} 
             alt="" 
-            className="w-full h-full object-cover opacity-[0.05] blur-2xl scale-110"
+            className="w-full h-full object-cover opacity-20 blur-3xl scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/80 to-gray-950" />
+          <div className="absolute inset-0 bg-gray-950/85" />
         </div>
       )}
 

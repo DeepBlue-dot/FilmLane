@@ -9,6 +9,7 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMsg(null);
+    setFieldErrors({});
     setSubmitting(true);
 
     try {
@@ -24,9 +26,18 @@ const LoginPage: React.FC = () => {
       const state = location.state as { from?: string } | null;
       const from = state?.from || '/home';
       navigate(from, { replace: true });
-    } catch (err: unknown) {
-      const axiosError = err as { message?: string };
-      setErrorMsg(axiosError.message || 'Invalid email or password');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Invalid email or password';
+      setErrorMsg(msg);
+
+      if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        const extracted: Record<string, string> = {};
+        for (const key in errors) {
+          extracted[key] = errors[key].msg;
+        }
+        setFieldErrors(extracted);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -71,12 +82,26 @@ const LoginPage: React.FC = () => {
                 name="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) {
+                    setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                  }
+                }}
                 placeholder="name@example.com"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.email
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.email && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             <div>
@@ -88,12 +113,26 @@ const LoginPage: React.FC = () => {
                 name="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) {
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                  }
+                }}
                 placeholder="••••••••"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.password
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.password && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between text-sm">

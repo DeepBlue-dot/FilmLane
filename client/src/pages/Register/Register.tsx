@@ -11,6 +11,7 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string | undefined>>({});
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -19,15 +20,24 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
+    setFieldErrors({});
 
-    // Basic password matches validation
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match');
-      return;
-    }
+    let hasClientErrors = false;
+    const newFieldErrors: Record<string, string> = {};
 
     if (password.length < 8) {
-      setErrorMsg('Password must be at least 8 characters long');
+      newFieldErrors.password = 'Password must be at least 8 characters long';
+      hasClientErrors = true;
+    }
+
+    if (password !== confirmPassword) {
+      newFieldErrors.confirmPassword = 'Passwords do not match';
+      hasClientErrors = true;
+    }
+
+    if (hasClientErrors) {
+      setFieldErrors(newFieldErrors);
+      setErrorMsg('Validation errors');
       return;
     }
 
@@ -47,9 +57,18 @@ const RegisterPage: React.FC = () => {
           navigate('/login');
         }, 2000);
       }
-    } catch (err) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setErrorMsg(axiosError.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      setErrorMsg(msg);
+
+      if (err.response?.data?.errors) {
+        const errors = err.response.data.errors;
+        const extracted: Record<string, string> = {};
+        for (const key in errors) {
+          extracted[key] = errors[key].msg;
+        }
+        setFieldErrors(extracted);
+      }
       setSubmitting(false);
     }
   };
@@ -99,12 +118,26 @@ const RegisterPage: React.FC = () => {
                 name="username"
                 id="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (fieldErrors.username) {
+                    setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                  }
+                }}
                 placeholder="john_doe"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.username
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.username && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.username}
+                </p>
+              )}
             </div>
 
             <div>
@@ -116,12 +149,26 @@ const RegisterPage: React.FC = () => {
                 name="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) {
+                    setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                  }
+                }}
                 placeholder="name@example.com"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.email
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.email && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             <div>
@@ -133,12 +180,26 @@ const RegisterPage: React.FC = () => {
                 name="password"
                 id="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) {
+                    setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                  }
+                }}
                 placeholder="•••••••• (min 8 chars)"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.password
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.password && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <div>
@@ -150,12 +211,26 @@ const RegisterPage: React.FC = () => {
                 name="confirmPassword"
                 id="confirmPassword"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (fieldErrors.confirmPassword) {
+                    setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                  }
+                }}
                 placeholder="••••••••"
                 required
                 disabled={submitting}
-                className="bg-gray-950/80 border-gray-800 focus:border-indigo-500 text-white placeholder-gray-600"
+                className={`bg-gray-950/80 text-white placeholder-gray-600 transition-all ${
+                  fieldErrors.confirmPassword
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                    : 'border-gray-800 focus:border-indigo-500'
+                }`}
               />
+              {fieldErrors.confirmPassword && (
+                <p className="mt-1.5 text-xs text-red-500 font-medium">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
             <div className="flex items-start text-sm py-2">

@@ -127,15 +127,16 @@ export default function TvEpisodePlayPage() {
     : '';
 
   return (
-    <div className="min-h-screen text-white flex flex-col justify-between select-none relative">
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between select-none relative">
       {/* Blurred Backdrop image for immersive atmosphere */}
       {backdropUrl && (
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <img 
             src={backdropUrl} 
             alt="" 
-            className="w-full h-full object-cover opacity-[0.06] blur-2xl scale-110"
+            className="w-full h-full object-cover opacity-20 blur-3xl scale-110"
           />
+          <div className="absolute inset-0 bg-gray-950/85" />
         </div>
       )}
 
