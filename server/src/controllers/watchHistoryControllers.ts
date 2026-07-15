@@ -5,7 +5,7 @@ import { parsePrismaQuery } from "../services/queryParser.js";
 export const getWatchHistoryByUserId = asyncHandler(
     async (req, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId', 'mediaType','watchedAt'],
+            allowedFields: ['id', 'tmdbId', 'mediaType', 'season', 'episode', 'watchedAt'],
             dateFields: ['watchedAt'],
             defaultLimit: 25,
             maxLimit: 100,
@@ -35,7 +35,7 @@ export const getWatchHistoryByUserId = asyncHandler(
 export const getUserWatchHistory = asyncHandler(
     async (req: any, res, next) => {
         const config = {
-            allowedFields: ['id', 'tmdbId','mediaType', 'watchedAt'],
+            allowedFields: ['id', 'tmdbId','mediaType', 'season', 'episode', 'watchedAt'],
             dateFields: ['watchedAt'],
             defaultLimit: 25,
             maxLimit: 100,
@@ -102,12 +102,16 @@ export const addWatchHistoryItem = asyncHandler(
     async (req: any, res, next) => {
         const tmdbIdInt = parseInt(req.body.tmdbId, 10);
         const mediaType = req.body.mediaType;
+        const season = req.body.season !== undefined && req.body.season !== null ? parseInt(req.body.season, 10) : null;
+        const episode = req.body.episode !== undefined && req.body.episode !== null ? parseInt(req.body.episode, 10) : null;
 
         const newItem = await prisma.watchHistory.create({
             data: {
                 tmdbId: tmdbIdInt,
                 userId: req.userId,
-                mediaType: mediaType
+                mediaType: mediaType,
+                season: season,
+                episode: episode
             }
         })
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { useWatchlist, WatchlistItem } from '../../hooks/useWatchlist.js';
@@ -25,6 +25,8 @@ interface HistoryItem {
   userId: string;
   tmdbId: number;
   mediaType: 'MOVIE' | 'SERIES' | 'SEASON' | 'EPISODE';
+  season?: number | null;
+  episode?: number | null;
   watchedAt: string;
   media: {
     id?: number;
@@ -36,7 +38,8 @@ interface HistoryItem {
 }
 
 export default function UserProfilePage() {
-  const { user, checkAuthStatus } = useAuth();
+  const navigate = useNavigate();
+  const { user, checkAuthStatus, logout } = useAuth();
   const { watchlist, watchlistIds, toggleWatchlist } = useWatchlist();
   
   const [searchParams, setSearchParams] = useSearchParams();
@@ -238,6 +241,17 @@ export default function UserProfilePage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("WARNING: Are you sure you want to permanently delete your FilmLane account? This cannot be undone.")) return;
+    try {
+      await api.delete('/users/me');
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error("Account deletion failed", err);
+    }
+  };
+
   const handleBookmarkToggle = async (id: number, type: 'movie' | 'tv') => {
     const isAdded = await toggleWatchlist(id, type);
     if (!isAdded) {
@@ -423,6 +437,26 @@ export default function UserProfilePage() {
                   </button>
                 </div>
               </form>
+
+              {/* Danger Zone: Delete Account */}
+              <div className="pt-6 border-t border-gray-850 space-y-4 text-left">
+                <h3 className="text-lg font-bold text-red-500 pb-1 flex items-center gap-2">
+                  <RiDeleteBin5Line className="text-red-500 w-5 h-5" />
+                  Danger Zone
+                </h3>
+                <div className="bg-red-950/10 border border-red-900/30 p-4 rounded-xl space-y-3">
+                  <p className="text-xs text-red-400">
+                    Permanently delete your FilmLane account. All your personal watchlists and history logs will be removed immediately. This action is irreversible.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -509,6 +543,11 @@ export default function UserProfilePage() {
                     const title = item.media.title || item.media.name || 'Untitled';
                     const isMovie = item.mediaType === 'MOVIE';
                     const detailPath = isMovie ? `/movies/${item.tmdbId}` : `/tv/${item.tmdbId}`;
+                    const playPath = isMovie
+                      ? `/movies/${item.tmdbId}/play`
+                      : (item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined)
+                        ? `/tv/${item.tmdbId}/season/${item.season}/episode/${item.episode}`
+                        : `/tv/${item.tmdbId}`;
                     const thumbUrl = item.media.backdrop_path
                       ? `https://image.tmdb.org/t/p/w300${item.media.backdrop_path}`
                       : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=300&auto=format&fit=crop';
@@ -521,14 +560,21 @@ export default function UserProfilePage() {
                             <img src={thumbUrl} alt={title} className="w-full h-full object-cover" />
                           </div>
 
-                          <div className="min-w-0">
+                          <div className="min-w-0 text-left">
                             <Link to={detailPath} className="text-sm font-bold text-white hover:text-indigo-400 transition-colors truncate block">
                               {title}
                             </Link>
-                            <span className="inline-block mt-1 text-[10px] uppercase font-bold text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
-                              {isMovie ? 'Movie' : 'TV Show'}
-                            </span>
-                            <div className="flex items-center gap-1 mt-1 text-gray-500 text-xs">
+                            <div className="flex items-center gap-2 flex-wrap mt-1">
+                              <span className="inline-block text-[10px] uppercase font-bold text-indigo-400 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
+                                {isMovie ? 'Movie' : 'TV Show'}
+                              </span>
+                              {!isMovie && item.season !== null && item.season !== undefined && item.episode !== null && item.episode !== undefined && (
+                                <span className="inline-block text-[10px] uppercase font-bold text-indigo-300 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900/30">
+                                  S{item.season} E{item.episode}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 mt-1.5 text-gray-500 text-xs">
                               <RiTimeLine className="w-3.5 h-3.5" />
                               <span>Watched on {formatDate(item.watchedAt)}</span>
                             </div>
@@ -538,7 +584,7 @@ export default function UserProfilePage() {
                         {/* Action buttons */}
                         <div className="flex items-center gap-2">
                           <Link
-                            to={isMovie ? `${detailPath}/play` : detailPath}
+                            to={playPath}
                             className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-lg transition-all shadow-md cursor-pointer"
                           >
                             Resume

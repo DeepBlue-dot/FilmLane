@@ -24,40 +24,48 @@ configure({ axios: api });
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public-only routes (unauthenticated users only) */}
-          <Route element={<PublicOnlyRoute />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-          </Route>
+      <div className="relative min-h-screen bg-gray-950 text-white overflow-x-hidden">
+        {/* Global animated ambient background blobs */}
+        <div className="fixed top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-indigo-600/10 blur-[130px] pointer-events-none z-0 animate-orb1" />
+        <div className="fixed bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-pink-600/5 blur-[130px] pointer-events-none z-0 animate-orb2" />
 
-          {/* Mixed routes: Layout is rendered for guests and members */}
-          <Route element={<Layout />}>
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/genre" />
-            <Route path="/countries" />
-            <Route path="/movies" element={<MovieDiscoveryPage />} />
-            <Route path="/tv" element={<TvDiscoveryPage />} />
-            <Route path="/topIMDB" element={<TopIMDBPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
-            <Route path="/tv/:tvId" element={<TvDetailsPage />} />
-            <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
+        <div className="relative z-10 min-h-screen flex flex-col">
+          <BrowserRouter>
+            <Routes>
+              {/* Public-only routes (unauthenticated users only) */}
+              <Route element={<PublicOnlyRoute />}>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+              </Route>
 
-            {/* Protected routes under Layout (authenticated users only) */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/profile" element={<UserProfilePage />} />
-              <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
-              <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
-            </Route>
-          </Route>
+              {/* Mixed routes: Layout is rendered for guests and members */}
+              <Route element={<Layout />}>
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/genre" />
+                <Route path="/countries" />
+                <Route path="/movies" element={<MovieDiscoveryPage />} />
+                <Route path="/tv" element={<TvDiscoveryPage />} />
+                <Route path="/topIMDB" element={<TopIMDBPage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+                <Route path="/tv/:tvId" element={<TvDetailsPage />} />
+                <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
 
-          {/* Catch-all 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+                {/* Protected routes under Layout (authenticated users only) */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/profile" element={<UserProfilePage />} />
+                  <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
+                  <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
+                </Route>
+              </Route>
+
+              {/* Catch-all 404 Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </div>
+      </div>
     </AuthProvider>
   );
 }

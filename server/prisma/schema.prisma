@@ -23,6 +23,8 @@ model WatchHistory {
   userId    String    @db.Char(36)
   tmdbId    Int
   mediaType MediaType
+  season    Int?
+  episode   Int?
   watchedAt DateTime? @default(now()) @db.DateTime(0)
   User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 

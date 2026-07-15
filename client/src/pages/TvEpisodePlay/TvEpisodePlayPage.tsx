@@ -21,7 +21,7 @@ export default function TvEpisodePlayPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [watchRecorded, setWatchRecorded] = useState(false);
-  const [activeSource, setActiveSource] = useState<'stream' | 'trailer'>('stream');
+  const [activeSource, setActiveSource] = useState<'vidsrc' | 'twoembed' | 'trailer'>('vidsrc');
 
   const activeSeason = parseInt(season_number || '1', 10);
   const activeEpisode = parseInt(episode_number || '1', 10);
@@ -55,6 +55,8 @@ export default function TvEpisodePlayPage() {
             await api.post('/users/me/watch-history', {
               tmdbId: seriesData.id.toString(),
               mediaType: 'SERIES',
+              season: activeSeason,
+              episode: activeEpisode,
             });
             setWatchRecorded(true);
           } catch (histErr) {
@@ -166,36 +168,54 @@ export default function TvEpisodePlayPage() {
       <main className="flex-grow flex flex-col items-center p-4 md:p-8 z-10 relative space-y-8 w-full max-w-7xl mx-auto">
         <div className="flex flex-col items-center gap-4 w-full max-w-5xl">
           {/* Stream Selector Controls */}
-          {trailer && (
-            <div className="flex bg-gray-900/90 border border-gray-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
-              <button
-                onClick={() => setActiveSource('stream')}
-                className={`px-5 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                  activeSource === 'stream'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Main Stream
-              </button>
+          <div className="flex bg-gray-900/90 border border-gray-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
+            <button
+              onClick={() => setActiveSource('vidsrc')}
+              className={`px-5 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeSource === 'vidsrc'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Server 1 (VidSrc)
+            </button>
+            <button
+              onClick={() => setActiveSource('twoembed')}
+              className={`px-5 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                activeSource === 'twoembed'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Server 2 (2Embed)
+            </button>
+            {trailer && (
               <button
                 onClick={() => setActiveSource('trailer')}
                 className={`px-5 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                   activeSource === 'trailer'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                    ? 'bg-indigo-600 text-white shadow-md'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
                 Official Trailer
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="w-full aspect-video bg-gray-950 rounded-2xl overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] border border-gray-850 relative">
-            {activeSource === 'stream' ? (
+            {activeSource === 'vidsrc' ? (
               <iframe
                 src={`https://vidsrc-embed.ru/embed/tv/${tvId}/${season_number}-${episode_number}`}
-                title={`${episode.name} - Main Stream`}
+                title={`${episode.name} - VidSrc`}
+                className="w-full h-full"
+                allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : activeSource === 'twoembed' ? (
+              <iframe
+                src={`https://www.2embed.online/embed/tv/${tvId}/${season_number}/${episode_number}`}
+                title={`${episode.name} - 2Embed`}
                 className="w-full h-full"
                 allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

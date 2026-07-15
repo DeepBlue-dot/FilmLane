@@ -13,7 +13,7 @@ export default function MoviePlayPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [watchRecorded, setWatchRecorded] = useState(false);
-  const [activeSource, setActiveSource] = useState<'stream' | 'trailer'>('stream');
+  const [activeSource, setActiveSource] = useState<'vidsrc' | 'twoembed' | 'trailer'>('vidsrc');
 
   useEffect(() => {
     const fetchMovieData = async () => {
@@ -120,18 +120,28 @@ export default function MoviePlayPage() {
       {/* Main Video Section */}
       <main className="flex-grow flex flex-col items-center justify-center p-4 md:px-8 md:py-2 z-10 relative space-y-4 w-full max-w-5xl mx-auto">
         {/* Stream Selector Controls */}
-        {trailer && (
-          <div className="flex bg-gray-900/90 border border-gray-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
-            <button
-              onClick={() => setActiveSource('stream')}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                activeSource === 'stream'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Main Stream
-            </button>
+        <div className="flex bg-gray-900/90 border border-gray-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
+          <button
+            onClick={() => setActiveSource('vidsrc')}
+            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              activeSource === 'vidsrc'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Server 1 (VidSrc)
+          </button>
+          <button
+            onClick={() => setActiveSource('twoembed')}
+            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+              activeSource === 'twoembed'
+                ? 'bg-indigo-600 text-white shadow-md'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            Server 2 (2Embed)
+          </button>
+          {trailer && (
             <button
               onClick={() => setActiveSource('trailer')}
               className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
@@ -142,14 +152,22 @@ export default function MoviePlayPage() {
             >
               Official Trailer
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="w-full aspect-video bg-gray-950 rounded-2xl overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] border border-gray-850 relative">
-          {activeSource === 'stream' ? (
+          {activeSource === 'vidsrc' ? (
             <iframe
               src={`https://vidsrc-embed.ru/embed/movie/${movieId}`}
-              title={`${movie.title} - Main Stream`}
+              title={`${movie.title} - VidSrc`}
+              className="w-full h-full"
+              allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          ) : activeSource === 'twoembed' ? (
+            <iframe
+              src={`https://www.2embed.online/embed/movie/${movieId}`}
+              title={`${movie.title} - 2Embed`}
               className="w-full h-full"
               allow="autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen

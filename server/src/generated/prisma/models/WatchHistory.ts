@@ -28,10 +28,14 @@ export type AggregateWatchHistory = {
 
 export type WatchHistoryAvgAggregateOutputType = {
   tmdbId: number | null
+  season: number | null
+  episode: number | null
 }
 
 export type WatchHistorySumAggregateOutputType = {
   tmdbId: number | null
+  season: number | null
+  episode: number | null
 }
 
 export type WatchHistoryMinAggregateOutputType = {
@@ -39,6 +43,8 @@ export type WatchHistoryMinAggregateOutputType = {
   userId: string | null
   tmdbId: number | null
   mediaType: $Enums.MediaType | null
+  season: number | null
+  episode: number | null
   watchedAt: Date | null
 }
 
@@ -47,6 +53,8 @@ export type WatchHistoryMaxAggregateOutputType = {
   userId: string | null
   tmdbId: number | null
   mediaType: $Enums.MediaType | null
+  season: number | null
+  episode: number | null
   watchedAt: Date | null
 }
 
@@ -55,6 +63,8 @@ export type WatchHistoryCountAggregateOutputType = {
   userId: number
   tmdbId: number
   mediaType: number
+  season: number
+  episode: number
   watchedAt: number
   _all: number
 }
@@ -62,10 +72,14 @@ export type WatchHistoryCountAggregateOutputType = {
 
 export type WatchHistoryAvgAggregateInputType = {
   tmdbId?: true
+  season?: true
+  episode?: true
 }
 
 export type WatchHistorySumAggregateInputType = {
   tmdbId?: true
+  season?: true
+  episode?: true
 }
 
 export type WatchHistoryMinAggregateInputType = {
@@ -73,6 +87,8 @@ export type WatchHistoryMinAggregateInputType = {
   userId?: true
   tmdbId?: true
   mediaType?: true
+  season?: true
+  episode?: true
   watchedAt?: true
 }
 
@@ -81,6 +97,8 @@ export type WatchHistoryMaxAggregateInputType = {
   userId?: true
   tmdbId?: true
   mediaType?: true
+  season?: true
+  episode?: true
   watchedAt?: true
 }
 
@@ -89,6 +107,8 @@ export type WatchHistoryCountAggregateInputType = {
   userId?: true
   tmdbId?: true
   mediaType?: true
+  season?: true
+  episode?: true
   watchedAt?: true
   _all?: true
 }
@@ -184,6 +204,8 @@ export type WatchHistoryGroupByOutputType = {
   userId: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season: number | null
+  episode: number | null
   watchedAt: Date | null
   _count: WatchHistoryCountAggregateOutputType | null
   _avg: WatchHistoryAvgAggregateOutputType | null
@@ -215,6 +237,8 @@ export type WatchHistoryWhereInput = {
   userId?: Prisma.StringFilter<"WatchHistory"> | string
   tmdbId?: Prisma.IntFilter<"WatchHistory"> | number
   mediaType?: Prisma.EnumMediaTypeFilter<"WatchHistory"> | $Enums.MediaType
+  season?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
+  episode?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
   watchedAt?: Prisma.DateTimeNullableFilter<"WatchHistory"> | Date | string | null
   User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -224,6 +248,8 @@ export type WatchHistoryOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   tmdbId?: Prisma.SortOrder
   mediaType?: Prisma.SortOrder
+  season?: Prisma.SortOrderInput | Prisma.SortOrder
+  episode?: Prisma.SortOrderInput | Prisma.SortOrder
   watchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   User?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.WatchHistoryOrderByRelevanceInput
@@ -237,6 +263,8 @@ export type WatchHistoryWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"WatchHistory"> | string
   tmdbId?: Prisma.IntFilter<"WatchHistory"> | number
   mediaType?: Prisma.EnumMediaTypeFilter<"WatchHistory"> | $Enums.MediaType
+  season?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
+  episode?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
   watchedAt?: Prisma.DateTimeNullableFilter<"WatchHistory"> | Date | string | null
   User?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
@@ -246,6 +274,8 @@ export type WatchHistoryOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   tmdbId?: Prisma.SortOrder
   mediaType?: Prisma.SortOrder
+  season?: Prisma.SortOrderInput | Prisma.SortOrder
+  episode?: Prisma.SortOrderInput | Prisma.SortOrder
   watchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.WatchHistoryCountOrderByAggregateInput
   _avg?: Prisma.WatchHistoryAvgOrderByAggregateInput
@@ -262,6 +292,8 @@ export type WatchHistoryScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"WatchHistory"> | string
   tmdbId?: Prisma.IntWithAggregatesFilter<"WatchHistory"> | number
   mediaType?: Prisma.EnumMediaTypeWithAggregatesFilter<"WatchHistory"> | $Enums.MediaType
+  season?: Prisma.IntNullableWithAggregatesFilter<"WatchHistory"> | number | null
+  episode?: Prisma.IntNullableWithAggregatesFilter<"WatchHistory"> | number | null
   watchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"WatchHistory"> | Date | string | null
 }
 
@@ -269,6 +301,8 @@ export type WatchHistoryCreateInput = {
   id?: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
   User: Prisma.UserCreateNestedOneWithoutWatchHistoryInput
 }
@@ -278,6 +312,8 @@ export type WatchHistoryUncheckedCreateInput = {
   userId: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
 }
 
@@ -285,6 +321,8 @@ export type WatchHistoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   User?: Prisma.UserUpdateOneRequiredWithoutWatchHistoryNestedInput
 }
@@ -294,6 +332,8 @@ export type WatchHistoryUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -302,6 +342,8 @@ export type WatchHistoryCreateManyInput = {
   userId: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
 }
 
@@ -309,6 +351,8 @@ export type WatchHistoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -317,6 +361,8 @@ export type WatchHistoryUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -341,11 +387,15 @@ export type WatchHistoryCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   tmdbId?: Prisma.SortOrder
   mediaType?: Prisma.SortOrder
+  season?: Prisma.SortOrder
+  episode?: Prisma.SortOrder
   watchedAt?: Prisma.SortOrder
 }
 
 export type WatchHistoryAvgOrderByAggregateInput = {
   tmdbId?: Prisma.SortOrder
+  season?: Prisma.SortOrder
+  episode?: Prisma.SortOrder
 }
 
 export type WatchHistoryMaxOrderByAggregateInput = {
@@ -353,6 +403,8 @@ export type WatchHistoryMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   tmdbId?: Prisma.SortOrder
   mediaType?: Prisma.SortOrder
+  season?: Prisma.SortOrder
+  episode?: Prisma.SortOrder
   watchedAt?: Prisma.SortOrder
 }
 
@@ -361,11 +413,15 @@ export type WatchHistoryMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   tmdbId?: Prisma.SortOrder
   mediaType?: Prisma.SortOrder
+  season?: Prisma.SortOrder
+  episode?: Prisma.SortOrder
   watchedAt?: Prisma.SortOrder
 }
 
 export type WatchHistorySumOrderByAggregateInput = {
   tmdbId?: Prisma.SortOrder
+  season?: Prisma.SortOrder
+  episode?: Prisma.SortOrder
 }
 
 export type WatchHistoryCreateNestedManyWithoutUserInput = {
@@ -422,10 +478,20 @@ export type EnumMediaTypeFieldUpdateOperationsInput = {
   set?: $Enums.MediaType
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type WatchHistoryCreateWithoutUserInput = {
   id?: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
 }
 
@@ -433,6 +499,8 @@ export type WatchHistoryUncheckedCreateWithoutUserInput = {
   id?: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
 }
 
@@ -470,6 +538,8 @@ export type WatchHistoryScalarWhereInput = {
   userId?: Prisma.StringFilter<"WatchHistory"> | string
   tmdbId?: Prisma.IntFilter<"WatchHistory"> | number
   mediaType?: Prisma.EnumMediaTypeFilter<"WatchHistory"> | $Enums.MediaType
+  season?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
+  episode?: Prisma.IntNullableFilter<"WatchHistory"> | number | null
   watchedAt?: Prisma.DateTimeNullableFilter<"WatchHistory"> | Date | string | null
 }
 
@@ -477,6 +547,8 @@ export type WatchHistoryCreateManyUserInput = {
   id?: string
   tmdbId: number
   mediaType: $Enums.MediaType
+  season?: number | null
+  episode?: number | null
   watchedAt?: Date | string | null
 }
 
@@ -484,6 +556,8 @@ export type WatchHistoryUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -491,6 +565,8 @@ export type WatchHistoryUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -498,6 +574,8 @@ export type WatchHistoryUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tmdbId?: Prisma.IntFieldUpdateOperationsInput | number
   mediaType?: Prisma.EnumMediaTypeFieldUpdateOperationsInput | $Enums.MediaType
+  season?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  episode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   watchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -508,6 +586,8 @@ export type WatchHistorySelect<ExtArgs extends runtime.Types.Extensions.Internal
   userId?: boolean
   tmdbId?: boolean
   mediaType?: boolean
+  season?: boolean
+  episode?: boolean
   watchedAt?: boolean
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchHistory"]>
@@ -519,10 +599,12 @@ export type WatchHistorySelectScalar = {
   userId?: boolean
   tmdbId?: boolean
   mediaType?: boolean
+  season?: boolean
+  episode?: boolean
   watchedAt?: boolean
 }
 
-export type WatchHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tmdbId" | "mediaType" | "watchedAt", ExtArgs["result"]["watchHistory"]>
+export type WatchHistoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "tmdbId" | "mediaType" | "season" | "episode" | "watchedAt", ExtArgs["result"]["watchHistory"]>
 export type WatchHistoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   User?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -537,6 +619,8 @@ export type $WatchHistoryPayload<ExtArgs extends runtime.Types.Extensions.Intern
     userId: string
     tmdbId: number
     mediaType: $Enums.MediaType
+    season: number | null
+    episode: number | null
     watchedAt: Date | null
   }, ExtArgs["result"]["watchHistory"]>
   composites: {}
@@ -912,6 +996,8 @@ export interface WatchHistoryFieldRefs {
   readonly userId: Prisma.FieldRef<"WatchHistory", 'String'>
   readonly tmdbId: Prisma.FieldRef<"WatchHistory", 'Int'>
   readonly mediaType: Prisma.FieldRef<"WatchHistory", 'MediaType'>
+  readonly season: Prisma.FieldRef<"WatchHistory", 'Int'>
+  readonly episode: Prisma.FieldRef<"WatchHistory", 'Int'>
   readonly watchedAt: Prisma.FieldRef<"WatchHistory", 'DateTime'>
 }
     

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
-import { RiMovie2Line, RiSearchLine, RiUser3Line, RiLogoutBoxRLine, RiHeartLine, RiHistoryLine, RiMenu3Line, RiCloseLine } from 'react-icons/ri';
+import { RiMovie2Line, RiSearchLine, RiUser3Line, RiLogoutBoxRLine, RiHeartLine, RiHistoryLine, RiMenu3Line, RiCloseLine, RiStarFill } from 'react-icons/ri';
 import { api } from '../../services/api.js';
 import { Genre } from '../../types/media.js';
 
@@ -19,13 +19,59 @@ const NavBar: React.FC = () => {
   const [genresDropdownOpen, setGenresDropdownOpen] = useState(false);
   const [mobileGenresOpen, setMobileGenresOpen] = useState(false);
 
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+
   // Close dropdowns on route changes
   useEffect(() => {
     setMobileMenuOpen(false);
     setProfileDropdownOpen(false);
     setGenresDropdownOpen(false);
     setMobileGenresOpen(false);
+    setShowDropdown(false);
   }, [location.pathname]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target as Node)) &&
+        (mobileSearchRef.current && !mobileSearchRef.current.contains(e.target as Node))
+      ) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch recommendations based on searchQuery
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setRecommendations([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      try {
+        const response = await api.get('/search/multi', {
+          params: { query: searchQuery.trim(), page: 1 }
+        });
+        const results = response.data?.results || [];
+        // Filter to only items with a title or name
+        const filtered = results.filter((item: any) => item.title || item.name).slice(0, 5);
+        setRecommendations(filtered);
+        setShowDropdown(filtered.length > 0);
+      } catch (err) {
+        console.error('Error fetching suggestions', err);
+      }
+    }, 250);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   // Fetch Genres list on mount
   useEffect(() => {
@@ -54,8 +100,83 @@ const NavBar: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      setShowDropdown(false);
       navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  const renderDropdown = () => {
+    if (!showDropdown || recommendations.length === 0) return null;
+
+    return (
+      <div className="absolute left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-md border border-indigo-500/20 rounded-xl shadow-2xl overflow-hidden z-[100] animate-fade-in divide-y divide-gray-800/40">
+        {recommendations.map((item) => {
+          const isMovie = item.media_type === 'movie' || !item.first_air_date;
+          const title = item.title || item.name;
+          const date = item.release_date || item.first_air_date || '';
+          const year = date ? date.split('-')[0] : '';
+          const rating = item.vote_average ? item.vote_average.toFixed(1) : null;
+          const posterUrl = item.poster_path
+            ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+            : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=92&auto=format&fit=crop';
+          const linkPath = isMovie ? `/movies/${item.id}` : `/tv/${item.id}`;
+
+          return (
+            <Link
+              key={`${item.media_type || 'media'}-${item.id}`}
+              to={linkPath}
+              onClick={() => {
+                setShowDropdown(false);
+                setSearchQuery('');
+              }}
+              className="flex items-center gap-3 p-2.5 hover:bg-indigo-600/10 transition-all cursor-pointer text-left group"
+            >
+              <img
+                src={posterUrl}
+                alt={title}
+                className="w-9 h-13 object-cover rounded-lg border border-gray-800/80 shadow-md flex-shrink-0 group-hover:border-indigo-500/30 transition-all"
+              />
+              <div className="flex-grow min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-xs font-bold text-white truncate group-hover:text-indigo-400 transition-colors">
+                    {title}
+                  </h4>
+                  {rating && rating !== '0.0' && (
+                    <span className="flex items-center gap-0.5 bg-amber-500/10 text-amber-400 text-[10px] font-extrabold px-1.5 py-0.5 rounded border border-amber-500/20 flex-shrink-0">
+                      <RiStarFill className="w-2.5 h-2.5" />
+                      <span>{rating}</span>
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium mt-1">
+                  <span className="uppercase font-bold text-indigo-400 tracking-wider">
+                    {isMovie ? 'Movie' : 'TV Show'}
+                  </span>
+                  {year && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-gray-700" />
+                      <span>{year}</span>
+                    </>
+                  )}
+                  {item.original_language && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-gray-700" />
+                      <span className="uppercase text-[9px]">{item.original_language}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+        <button
+          onClick={handleSearchSubmit}
+          className="w-full text-center py-2 text-[11px] font-bold text-indigo-400 hover:text-indigo-300 hover:bg-indigo-600/5 transition-all uppercase tracking-wider cursor-pointer"
+        >
+          View all results for &ldquo;{searchQuery}&rdquo;
+        </button>
+      </div>
+    );
   };
 
   const handleLogout = async () => {
@@ -162,16 +283,22 @@ const NavBar: React.FC = () => {
 
           {/* Desktop Search & User Profile section */}
           <div className="hidden md:flex items-center gap-4">
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input
-                type="text"
-                placeholder="Search movies & shows..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-60 bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500 focus:w-72 transition-all"
-              />
-              <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
-            </form>
+            <div ref={desktopSearchRef} className="relative">
+              <form onSubmit={handleSearchSubmit}>
+                <input
+                  type="text"
+                  placeholder="Search movies & shows..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => {
+                    if (recommendations.length > 0) setShowDropdown(true);
+                  }}
+                  className="w-60 bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500 focus:w-72 transition-all"
+                />
+                <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
+              </form>
+              {renderDropdown()}
+            </div>
 
             {isAuthenticated ? (
               <div className="relative">
@@ -245,16 +372,22 @@ const NavBar: React.FC = () => {
       {/* Mobile Menu Panel */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-gray-950 border-t border-gray-900 px-4 pt-2 pb-4 space-y-3">
-          <form onSubmit={handleSearchSubmit} className="relative mt-2">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500"
-            />
-            <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
-          </form>
+          <div ref={mobileSearchRef} className="relative mt-2">
+            <form onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => {
+                  if (recommendations.length > 0) setShowDropdown(true);
+                }}
+                className="w-full bg-gray-900 text-sm text-white placeholder-gray-500 pl-10 pr-4 py-2 border border-gray-800 rounded-full focus:outline-none focus:border-indigo-500"
+              />
+              <RiSearchLine className="absolute left-3.5 top-2.5 text-gray-500 w-4 h-4" />
+            </form>
+            {renderDropdown()}
+          </div>
 
           <div className="space-y-1">
             {navLinks.map((link) => (

@@ -660,6 +660,8 @@ export const WatchHistoryScalarFieldEnum = {
   userId: 'userId',
   tmdbId: 'tmdbId',
   mediaType: 'mediaType',
+  season: 'season',
+  episode: 'episode',
   watchedAt: 'watchedAt'
 } as const
 
