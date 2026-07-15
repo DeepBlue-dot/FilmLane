@@ -45,10 +45,24 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-950 text-white relative overflow-x-hidden">
-      {/* Background decoration elements */}
-      <div className="absolute top-0 inset-x-0 h-[600px] bg-[radial-gradient(circle_at_top,rgba(79,70,229,0.18),transparent_65%)] pointer-events-none"></div>
-      <div className="absolute bottom-0 inset-x-0 h-[500px] bg-[radial-gradient(circle_at_bottom,rgba(219,39,119,0.08),transparent_60%)] pointer-events-none"></div>
-      <div className="absolute inset-0 bg-[#000000] bg-[radial-gradient(#ffffff04_1px,transparent_1px)] bg-[size:32px_32px] opacity-70 pointer-events-none"></div>
+      {/* Cinematic Poster Backdrop */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none z-0 opacity-[0.08] transition-opacity duration-1000">
+        <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[110%] h-[110%] -translate-x-[5%] -translate-y-[5%] -rotate-2">
+          {Array.from({ length: 24 }).map((_, idx) => {
+            const movie = trending.length > 0 ? trending[idx % trending.length] : null;
+            const posterUrl = movie?.poster_path
+              ? `https://image.tmdb.org/t/p/w185${movie.poster_path}`
+              : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=185&auto=format&fit=crop';
+            return (
+              <div key={idx} className="aspect-[2/3] rounded-xl overflow-hidden bg-gray-900 border border-gray-800/40">
+                <img src={posterUrl} alt="" className="w-full h-full object-cover filter grayscale opacity-60" />
+              </div>
+            );
+          })}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950 via-gray-950/85 to-gray-950"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(79,70,229,0.15),transparent_70%)]"></div>
+      </div>
 
       {/* Navigation Header */}
       <NavBar />

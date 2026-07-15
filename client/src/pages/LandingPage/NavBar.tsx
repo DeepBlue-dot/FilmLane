@@ -1,22 +1,17 @@
 import { Link } from "react-router-dom";
+import { RiMovie2Line } from 'react-icons/ri';
 
 export default function NavBar() {
   return (
     
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8"
-            alt="Flowbite Logo"
-          />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            Flowbite
+        <Link to="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-wider text-gray-900 dark:text-white">
+          <RiMovie2Line className="w-8 h-8 text-indigo-500" />
+          <span>
+            FILM<span className="text-indigo-500">LANE</span>
           </span>
-        </a>
+        </Link>
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <button
             type="button"

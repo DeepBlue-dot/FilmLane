@@ -82,3 +82,20 @@ body {
 .animate-orb2 {
   animation: floatOrb2 30s infinite alternate ease-in-out;
 }
+
+/* Diagonal slow scroll for background grid */
+@keyframes diagonalScroll {
+  0% {
+    transform: translate(-2%, -2%) rotate(-2deg);
+  }
+  50% {
+    transform: translate(-6%, -6%) rotate(-2deg);
+  }
+  100% {
+    transform: translate(-2%, -2%) rotate(-2deg);
+  }
+}
+
+.animate-diagonal-scroll {
+  animation: diagonalScroll 50s linear infinite alternate;
+}
