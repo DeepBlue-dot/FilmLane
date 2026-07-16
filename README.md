@@ -1,6 +1,6 @@
 # FilmLane 🎬
 
-A modern movie streaming platform built with TypeScript, React, and Node.js. Powered by TMDB's extensive media database with personalized watchlists and viewing history.
+A modern movie streaming platform built with TypeScript, React, and Node.js. Powered by TMDB's extensive media database with personalized watchlists and viewing history.  ([DEMO](https://filelane-blond.vercel.app))
 
 [![React](https://img.shields.io/badge/React-19-%2361DAFB)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-%233178C6)](https://www.typescriptlang.org/)
