@@ -8,7 +8,8 @@
     "test": "jest --runInBand --coverage",
     "start": "node dist/index.js",
     "dev": "nodemon",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run build "
   },
   "keywords": [],
   "author": "",

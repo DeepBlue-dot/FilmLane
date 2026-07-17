@@ -46,6 +46,17 @@ export const userRegester: RequestHandler = asyncHandler(
 export const userLogin: RequestHandler = asyncHandler(
     async (req, res) => {
         const { email, password } = req.body
+
+        // 🚨 1. GUARD: Prevent Prisma from invoking with undefined values
+        if (!email || !password) {
+            res.status(400).json({
+                status: "failed",
+                message: "Please provide both an email and password",
+            });
+            return;
+        }
+
+        // Now safe to query
         const user = await prisma.user.findUnique({
             where: {
                 email
@@ -88,7 +99,7 @@ export const userLogin: RequestHandler = asyncHandler(
 
         return
     })
-
+    
 export const userLogOut: RequestHandler = asyncHandler(
     async (req, res) => {
         res.cookie("jwt", "loggedout", {

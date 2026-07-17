@@ -75,7 +75,7 @@ const LoginPage: React.FC = () => {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Your Email Address
+                Email Address
               </label>
               <Input
                 type="email"

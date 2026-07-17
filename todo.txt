@@ -1,3 +1,4 @@
 add omdbapi as a backup
 add more qurated pages
 fix login and registration for prod
+update the rectriction on watching movies
