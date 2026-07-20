@@ -180,7 +180,7 @@ export default function TvEpisodePlayPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Server 1 (VidSrc)
+              Server 1
             </button>
             <button
               onClick={() => setActiveSource('twoembed')}
@@ -190,7 +190,7 @@ export default function TvEpisodePlayPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Server 2 (2Embed)
+              Server 2
             </button>
             {trailer && (
               <button
