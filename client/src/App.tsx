@@ -18,6 +18,8 @@ import TvDetailsPage from "./pages/TvDetails/TvDetailsPage.js";
 import MoviePlayPage from "./pages/MoviePlay/MoviePlayPage.js";
 import TvEpisodePlayPage from "./pages/TvEpisodePlay/TvEpisodePlayPage.js";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.js";
+import TrendingPage from "./pages/Trending/TrendingPage.js";
+import UpcomingPage from "./pages/Upcoming/UpcomingPage.js";
 
 configure({ axios: api });
 
@@ -46,17 +48,20 @@ export default function App() {
                 <Route path="/countries" />
                 <Route path="/movies" element={<MovieDiscoveryPage />} />
                 <Route path="/tv" element={<TvDiscoveryPage />} />
+                <Route path="/trending" element={<TrendingPage />} />
+                <Route path="/upcoming" element={<UpcomingPage />} />
                 <Route path="/topIMDB" element={<TopIMDBPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
                 <Route path="/tv/:tvId" element={<TvDetailsPage />} />
                 <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
 
+                <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
+                <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
+
                 {/* Protected routes under Layout (authenticated users only) */}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/profile" element={<UserProfilePage />} />
-                  <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
-                  <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
                 </Route>
               </Route>
 

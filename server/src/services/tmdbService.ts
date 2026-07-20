@@ -352,7 +352,38 @@ class TMDBService {
         }
     }
 
+    async getTrending(mediaType: 'all' | 'movie' | 'tv', timeWindow: 'day' | 'week', page = 1): Promise<any> {
+        try {
+            const response = await this.axiosInstance.get(`/trending/${mediaType}/${timeWindow}`, {
+                params: { page }
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
 
+    async getUpcomingMovies(page = 1): Promise<any> {
+        try {
+            const response = await this.axiosInstance.get(`/movie/upcoming`, {
+                params: { page }
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    async getNowPlayingMovies(page = 1): Promise<any> {
+        try {
+            const response = await this.axiosInstance.get(`/movie/now_playing`, {
+                params: { page }
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
 
     private handleError(error: any): never {
         if (axios.isAxiosError(error)) {

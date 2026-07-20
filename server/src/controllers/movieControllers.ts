@@ -187,3 +187,32 @@ export const getPersonDetails = asyncHandler(
         res.status(200).json(response);
     }
 )
+
+export const getTrendingMedia = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const mediaType = (req.params.media_type as 'all' | 'movie' | 'tv') || 'all';
+        const timeWindow = (req.params.time_window as 'day' | 'week') || 'week';
+        const page = Number(req.query.page) || 1;
+        const response = await tmdb.getTrending(mediaType, timeWindow, page);
+        res.status(200).json(response);
+    }
+)
+
+export const getUpcoming = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const page = Number(req.query.page) || 1;
+        const response = await tmdb.getUpcomingMovies(page);
+        res.status(200).json(response);
+    }
+)
+
+export const getNowPlaying = asyncHandler(
+    async (req, res, next) => {
+        const tmdb = new TMDBService({ language: `${req.query.language}`, include_adult: Boolean(req.query.include_adult || false) });
+        const page = Number(req.query.page) || 1;
+        const response = await tmdb.getNowPlayingMovies(page);
+        res.status(200).json(response);
+    }
+)

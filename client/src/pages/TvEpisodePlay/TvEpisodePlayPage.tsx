@@ -4,6 +4,7 @@ import { api } from '../../services/api.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { RiArrowLeftLine, RiMovie2Line, RiArrowRightLine, RiStarFill, RiCalendarLine, RiPlayMiniFill } from 'react-icons/ri';
 import { MediaDetails, VideoResult, Episode, Season } from '../../types/media.js';
+import { useAuth } from '../../context/AuthContext.js';
 
 type EpisodePlayDetails = Episode & {
   videos?: {
@@ -14,6 +15,7 @@ type EpisodePlayDetails = Episode & {
 export default function TvEpisodePlayPage() {
   const { tvId, season_number, episode_number } = useParams<{ tvId: string; season_number: string; episode_number: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const [series, setSeries] = useState<MediaDetails | null>(null);
   const [episode, setEpisode] = useState<EpisodePlayDetails | null>(null);
@@ -50,7 +52,7 @@ export default function TvEpisodePlayPage() {
         setSeasonEpisodes(seasonData);
 
         // Auto-record watch history
-        if (!watchRecorded) {
+        if (isAuthenticated && !watchRecorded) {
           try {
             await api.post('/users/me/watch-history', {
               tmdbId: seriesData.id.toString(),
@@ -72,7 +74,7 @@ export default function TvEpisodePlayPage() {
     };
 
     fetchTvPlaybackData();
-  }, [tvId, season_number, episode_number, watchRecorded]);
+  }, [tvId, season_number, episode_number, watchRecorded, isAuthenticated]);
 
   // Reset history tracker when navigating to a different episode
   useEffect(() => {

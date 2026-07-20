@@ -1,7 +1,11 @@
 import { Router } from "express";
-import { discoverMovies, discoverTvShows, getCountriesList, getLanguagesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows, getTVSimilar, getTVRecommendations, searchPerson, getPersonDetails } from "../controllers/movieControllers.js";
+import { discoverMovies, discoverTvShows, getCountriesList, getLanguagesList, getMovieDetails, getMoviesGenreList, getMoviesGenreName, getTvEpisodeDetails, getTvSeasonDetails, getTvShowDetails, getTvShowGenreList, getTvShowGenreName, searchAll, searchMovie, searchTVShows, getTVSimilar, getTVRecommendations, searchPerson, getPersonDetails, getTrendingMedia, getUpcoming, getNowPlaying } from "../controllers/movieControllers.js";
 
 const movieRoutes: Router= Router()
+
+movieRoutes.get("/movie/upcoming", getUpcoming)
+movieRoutes.get("/movie/now-playing", getNowPlaying)
+movieRoutes.get("/trending/:media_type/:time_window", getTrendingMedia)
 
 movieRoutes.get("/movie/:movieId", getMovieDetails)
 movieRoutes.get("/tv/:series_id", getTvShowDetails)

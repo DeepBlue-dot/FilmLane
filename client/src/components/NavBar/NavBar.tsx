@@ -188,6 +188,7 @@ const NavBar: React.FC = () => {
     { name: 'Home', path: '/home' },
     { name: 'Movies', path: '/movies' },
     { name: 'TV Shows', path: '/tv' },
+    { name: 'Trending', path: '/trending' },
     { name: 'Top IMDb', path: '/topIMDB' },
   ];
 

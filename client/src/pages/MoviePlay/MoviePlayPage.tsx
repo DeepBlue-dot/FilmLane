@@ -4,10 +4,12 @@ import { api } from '../../services/api.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
 import { RiArrowLeftLine, RiMovie2Line, RiStarFill } from 'react-icons/ri';
 import { MediaDetails, VideoResult } from '../../types/media.js';
+import { useAuth } from '../../context/AuthContext.js';
 
 export default function MoviePlayPage() {
   const { movieId } = useParams<{ movieId: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   
   const [movie, setMovie] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function MoviePlayPage() {
         setMovie(movieData);
 
         // Auto-record watch history
-        if (!watchRecorded) {
+        if (isAuthenticated && !watchRecorded) {
           try {
             await api.post('/users/me/watch-history', {
               tmdbId: movieData.id.toString(),
@@ -48,7 +50,7 @@ export default function MoviePlayPage() {
     };
 
     fetchMovieData();
-  }, [movieId, watchRecorded]);
+  }, [movieId, watchRecorded, isAuthenticated]);
 
   if (loading) {
     return (
