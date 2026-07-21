@@ -30,6 +30,7 @@ export interface MediaItem {
   popularity?: number;
   original_language?: string;
   media_type?: string;
+  imdb_id?: string;
 }
 
 export interface VideoResult {

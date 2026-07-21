@@ -311,15 +311,33 @@ class TMDBService {
     async getTVShowDetails(tvId: number, options?: { appendToResponse?: any }): Promise<TMDBTVShowDetails> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
+            let appendToResponse = options?.appendToResponse;
+            if (appendToResponse) {
+                if (!appendToResponse.includes('external_ids')) {
+                    appendToResponse += ',external_ids';
+                }
+            } else {
+                appendToResponse = 'external_ids';
+            }
+
             const response = await this.axiosInstance.get(`/tv/${tvId}`, {
                 params: {
-                    append_to_response: options?.appendToResponse
+                    append_to_response: appendToResponse
                 }
             });
-            return response.data;
+
+            const data = response.data;
+            if (data && data.external_ids && data.external_ids.imdb_id) {
+                data.imdb_id = data.external_ids.imdb_id;
+            }
+            return data;
         } catch (error) {
             console.warn(`[TMDBService] Failed to fetch TV show details for ${tvId} from TMDB, using OMDb fallback`);
-            return this.omdbService.getTVShowDetails(tvId);
+            const fallbackData = await this.omdbService.getTVShowDetails(tvId);
+            if (fallbackData) {
+                fallbackData.imdb_id = this.omdbService['formatImdbId'](tvId);
+            }
+            return fallbackData;
         }
     }
 

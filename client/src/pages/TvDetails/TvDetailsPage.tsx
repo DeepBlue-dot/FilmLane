@@ -280,6 +280,16 @@ export default function TvDetailsPage() {
                   </>
                 )}
               </button>
+              {series.imdb_id && (
+                <a
+                  href={`https://www.imdb.com/title/${series.imdb_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-sm transition-all transform hover:-translate-y-0.5 shadow-lg hover:shadow-amber-500/20 cursor-pointer"
+                >
+                View on<span className="bg-black text-amber-500 px-1.5 py-0.5 rounded text-[10px] font-black tracking-tighter">IMDb</span>
+                </a>
+              )}
             </div>
           </div>
         </div>
