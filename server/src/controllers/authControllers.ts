@@ -57,11 +57,24 @@ export const userLogin: RequestHandler = asyncHandler(
         }
 
         // Now safe to query
-        const user = await prisma.user.findUnique({
-            where: {
-                email
-            },
-        })
+        let user: any = null;
+        try {
+            user = await prisma.user.findUnique({
+                where: { email },
+            });
+        } catch (err: unknown) {
+            console.dir(err, { depth: null });
+
+            // Check if it's a Prisma known request error
+            if (err && typeof err === "object" && "code" in err && "message" in err) {
+                console.log("Code:", (err as any).code);
+                console.log("Message:", (err as any).message);
+                console.log("Meta:", (err as any).meta);
+                console.log("Client Version:", (err as any).clientVersion);
+            }
+
+            throw err;
+        }
 
         if (user) {
             const valid = await bcrypt.compare(password, user.passwordHash)

@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace.js"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.8.0",
-  "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
+  "clientVersion": "7.9.0",
+  "engineVersion": "e922089b7d7502aff4249d5da3420f6fa55fc6ad",
   "activeProvider": "postgresql",
   "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id            String          @id @default(uuid()) @db.Char(36)\n  email         String          @unique(map: \"email\") @db.VarChar(255)\n  passwordHash  String          @db.VarChar(255)\n  username      String          @db.VarChar(50)\n  createdAt     DateTime?       @default(now()) @db.Timestamp(0)\n  updatedAt     DateTime?       @default(now()) @db.Timestamp(0)\n  WatchHistory  WatchHistory[]\n  WatchlistItem WatchlistItem[]\n}\n\nmodel WatchHistory {\n  id        String    @id @default(uuid()) @db.Char(36)\n  userId    String    @db.Char(36)\n  tmdbId    Int\n  mediaType MediaType\n  season    Int?\n  episode   Int?\n  watchedAt DateTime? @default(now()) @db.Timestamp(0)\n  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@index([userId], map: \"idx_WatchHistory_userId\")\n}\n\nmodel WatchlistItem {\n  id        String    @id @default(uuid()) @db.Char(36)\n  userId    String    @db.Char(36)\n  tmdbId    Int\n  mediaType MediaType\n  addedAt   DateTime? @default(now()) @db.Timestamp(0)\n  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n\n  @@unique([userId, tmdbId, mediaType], map: \"unique_watchlist\")\n}\n\nenum MediaType {\n  MOVIE\n  SERIES\n  SEASON\n  EPISODE\n}\n",
   "runtimeDataModel": {
@@ -82,7 +82,7 @@ export interface PrismaClientConstructor {
     LogOpts extends LogOptions<Options> = LogOptions<Options>,
     OmitOpts extends Prisma.PrismaClientOptions['omit'] = Options extends { omit: infer U } ? U : Prisma.PrismaClientOptions['omit'],
     ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
-  >(options: Prisma.Subset<Options, Prisma.PrismaClientOptions> ): PrismaClient<LogOpts, OmitOpts, ExtArgs>
+  >(options: Prisma.PrismaClientConstructorArgs<Options>): PrismaClient<LogOpts, OmitOpts, ExtArgs>
 }
 
 /**
@@ -103,7 +103,7 @@ export interface PrismaClientConstructor {
 
 export interface PrismaClient<
   in LogOpts extends Prisma.LogLevel = never,
-  in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = undefined,
+  in out OmitOpts extends Prisma.PrismaClientOptions['omit'] = Prisma.PrismaClientOptions['omit'],
   in out ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }

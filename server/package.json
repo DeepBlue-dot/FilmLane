@@ -17,7 +17,8 @@
   "type": "module",
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^7.9.0",
+    "@prisma/extension-accelerate": "^3.0.1",
     "axios": "^1.8.3",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
@@ -41,7 +42,7 @@
     "@types/supertest": "^7.2.1",
     "jest": "^30.4.2",
     "nodemon": "^3.1.9",
-    "prisma": "^7.8.0",
+    "prisma": "^7.9.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",

@@ -1,14 +1,14 @@
 // tmdb.service.ts
 import axios, { AxiosInstance } from 'axios';
 import { DiscoverMoviesParams, DiscoverTvShowParams, Genre, PaginatedResponse, paramMappings, TMDBMedia, TMDBMovieCredits, TMDBMovieDetails, TMDBMovieResult, TMDBTvShowCredits, TMDBTVShowDetails, TMDBVideos, TMDBTVShowResult, paramMappingsTv, TvSeasonDetails, TvEpisodeDetails, TMDBCountries, TMDBLanguages, MultiSearchResult, TMDBPersonResult } from './interfaces.js';
-
-
+import OMDBService from './omdbService.js';
 
 class TMDBService {
     private apiKey: string;
     private baseUrl: string;
     private axiosInstance: AxiosInstance;
     private authMode: 'bearer' | 'query';
+    private omdbService: OMDBService;
 
     constructor(options?: {
         language?: string;
@@ -23,15 +23,7 @@ class TMDBService {
         this.apiKey = options?.apiKey || process.env.TMDB_API_KEY || '';
         this.baseUrl = options?.baseUrl || process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3';
         this.authMode = options?.authMode || (process.env.TMDB_API_AUTH_MODE as any) || 'bearer';
-
-        if (!this.apiKey) {
-            throw new Error('TMDB_API_KEY environment variable is required');
-        }
-
-        if (options?.axiosInstance) {
-            this.axiosInstance = options.axiosInstance;
-            return;
-        }
+        this.omdbService = new OMDBService();
 
         const defaultParams: Record<string, any> = {
             language,
@@ -39,58 +31,68 @@ class TMDBService {
         };
 
         if (this.authMode === 'query') {
-            // use api_key as query param for v3 style access
             defaultParams.api_key = this.apiKey;
         }
 
         const defaultHeaders: Record<string, string> = {};
-        if (this.authMode === 'bearer') {
+        if (this.authMode === 'bearer' && this.apiKey) {
             defaultHeaders.Authorization = `Bearer ${this.apiKey}`;
         }
 
-        this.axiosInstance = axios.create({
-            baseURL: this.baseUrl,
-            headers: defaultHeaders,
-            params: defaultParams,
-        });
+        if (options?.axiosInstance) {
+            this.axiosInstance = options.axiosInstance;
+        } else {
+            this.axiosInstance = axios.create({
+                baseURL: this.baseUrl,
+                headers: defaultHeaders,
+                params: defaultParams,
+            });
+        }
     }
 
     async getCountriesList(): Promise<TMDBCountries[]> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/configuration/countries`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch countries from TMDB, using OMDb fallback');
+            return this.omdbService.getCountriesList();
         }
     }
 
     async getLanguagesList(): Promise<TMDBLanguages[]> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/configuration/languages`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch languages from TMDB, using OMDb fallback');
+            return this.omdbService.getLanguagesList();
         }
     }
 
     // Movie Endpoints
     async getMoviesGenreList(): Promise<{ genres: Genre[] }> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/genre/movie/list`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch movie genres from TMDB, using OMDb fallback');
+            return this.omdbService.getMoviesGenreList();
         }
     }
 
     async getMoviesGenreName(id: number): Promise<Genre | null> {
-        const list = await this.getMoviesGenreList()
+        const list = await this.getMoviesGenreList();
         const genre = list.genres.find((g: Genre) => g.id === id);
         return genre ? genre : null;
     }
 
     async getMovieDetails(movieId: number, options?: { appendToResponse?: any }): Promise<TMDBMovieDetails> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}`, {
                 params: {
                     append_to_response: options?.appendToResponse,
@@ -98,64 +100,75 @@ class TMDBService {
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch movie details for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getMovieDetails(movieId);
         }
     }
 
     async getSimilarMovies(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}/similar`, {
                 params: { page },
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch similar movies for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getSimilarMovies(movieId, page);
         }
     }
 
     async getMovieRecommendations(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}/recommendations`, {
                 params: { page },
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch recommendations for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getMovieRecommendations(movieId, page);
         }
     }
 
     async getMovieCredits(movieId: number): Promise<TMDBMovieCredits> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}/credits`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch movie credits for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getMovieCredits(movieId);
         }
     }
 
     async getMovieImages(movieId: number): Promise<TMDBMedia> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}/images`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch movie images for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getMovieImages(movieId);
         }
     }
 
     async getMovieVideos(movieId: number): Promise<TMDBVideos> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/${movieId}/videos`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch movie videos for ${movieId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getMovieVideos(movieId);
         }
     }
 
     async discoverMovies(params: DiscoverMoviesParams): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const transformedParams: Record<string, any> = {};
 
-            // Transform camelCase params to API-expected format
             for (const key in params) {
                 const mappedKey = paramMappings[key] || key;
                 transformedParams[mappedKey] = params[key as keyof DiscoverMoviesParams];
@@ -166,57 +179,64 @@ class TMDBService {
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to discover movies from TMDB, using OMDb fallback');
+            return this.omdbService.discoverMovies(params);
         }
     }
 
     async searchMovie(options: { query: string, page: number, primary_release_year?: string, region?: string, year?: string }): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/movie`, { params: { ...options } })
-            return response.data
-
+            if (!this.apiKey) throw new Error('No TMDB key');
+            const response = await this.axiosInstance.get(`/search/movie`, { params: { ...options } });
+            return response.data;
         } catch (error) {
-            this.handleError(error)
+            console.warn(`[TMDBService] Failed to search movies (${options.query}) from TMDB, using OMDb fallback`);
+            return this.omdbService.searchMovie(options);
         }
     }
 
-
     async searchAll(options: { query: string, page: number }): Promise<PaginatedResponse<MultiSearchResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/multi`, { params: { ...options } })
-            return response.data
-
+            if (!this.apiKey) throw new Error('No TMDB key');
+            const response = await this.axiosInstance.get(`/search/multi`, { params: { ...options } });
+            return response.data;
         } catch (error) {
-            this.handleError(error)
+            console.warn(`[TMDBService] Failed multi-search (${options.query}) from TMDB, using OMDb fallback`);
+            return this.omdbService.searchAll(options);
         }
     }
 
     async searchPerson(options: { query: string, page?: number }): Promise<PaginatedResponse<TMDBPersonResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/search/person`, { params: { ...options } });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to search person (${options.query}) from TMDB, using OMDb fallback`);
+            return this.omdbService.searchPerson(options);
         }
     }
 
     async searchTVShows(options: { query: string, page: number, first_air_date_year?: string, year?: string }): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
-            const response = await this.axiosInstance.get(`/search/tv`, { params: { ...options } })
-            return response.data
-
+            if (!this.apiKey) throw new Error('No TMDB key');
+            const response = await this.axiosInstance.get(`/search/tv`, { params: { ...options } });
+            return response.data;
         } catch (error) {
-            this.handleError(error)
+            console.warn(`[TMDBService] Failed to search TV shows (${options.query}) from TMDB, using OMDb fallback`);
+            return this.omdbService.searchTVShows(options);
         }
     }
-    // TV Show Endpoints
 
+    // TV Show Endpoints
     async getTVShowGenreList(): Promise<Genre[]> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/genre/tv/list`);
             return response.data.genres;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch TV genres from TMDB, using OMDb fallback');
+            return this.omdbService.getTVShowGenreList();
         }
     }
 
@@ -228,6 +248,7 @@ class TMDBService {
 
     async getTVShowDetails(tvId: number, options?: { appendToResponse?: any }): Promise<TMDBTVShowDetails> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${tvId}`, {
                 params: {
                     append_to_response: options?.appendToResponse
@@ -235,99 +256,115 @@ class TMDBService {
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch TV show details for ${tvId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTVShowDetails(tvId);
         }
     }
 
     async getPopularTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get('/tv/popular', {
                 params: { page },
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch popular TV shows from TMDB, using OMDb fallback');
+            return this.omdbService.getPopularTVShows(page);
         }
     }
 
     async getTVSimilar(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${tvId}/similar`, { params: { page } });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch similar TV shows for ${tvId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTVSimilar(tvId, page);
         }
     }
 
     async getTVRecommendations(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${tvId}/recommendations`, { params: { page } });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch TV recommendations for ${tvId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTVRecommendations(tvId, page);
         }
     }
 
     async getPersonDetails(personId: number): Promise<TMDBPersonResult> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/person/${personId}`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch person details for ${personId} from TMDB, using OMDb fallback`);
+            return this.omdbService.getPersonDetails(personId);
         }
     }
 
     async getTopRatedTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get('/tv/top_rated', {
                 params: { page },
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch top rated TV shows from TMDB, using OMDb fallback');
+            return this.omdbService.getTopRatedTVShows(page);
         }
     }
 
     async getTvShowsAggregateCredits(series_id: number): Promise<TMDBTvShowCredits> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${series_id}/aggregate_credits`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch aggregate credits for ${series_id} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTvShowsCredits(series_id);
         }
     }
 
     async getTvShowsCredits(series_id: number): Promise<TMDBTvShowCredits> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${series_id}/credits`);
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch credits for ${series_id} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTvShowsCredits(series_id);
         }
     }
 
     async discoverTvShows(params: DiscoverTvShowParams): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const transformedParams: Record<string, any> = {};
 
-            // Map the parameters from camelCase to the API-expected keys
             for (const key in params) {
                 const mappedKey = paramMappingsTv[key] || key;
                 transformedParams[mappedKey] = params[key as keyof DiscoverTvShowParams];
             }
 
-            // Make the request to the /discover/tv endpoint with the transformed parameters.
             const response = await this.axiosInstance.get('/discover/tv', {
                 params: transformedParams,
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to discover TV shows from TMDB, using OMDb fallback');
+            return this.omdbService.discoverTvShows(params);
         }
     }
 
     async getTVSeasonsDetails(series_id: number, season_number: number, options?: { appendToResponse?: any }): Promise<TvSeasonDetails> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}`, {
                 params: {
                     append_to_response: options?.appendToResponse
@@ -335,12 +372,14 @@ class TMDBService {
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch season details for ${series_id} S${season_number} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTVSeasonsDetails(series_id, season_number);
         }
     }
 
     async getTVEpisodesDetails(series_id: number, season_number: number, episode_number: number, options?: { appendToResponse?: any }): Promise<TvEpisodeDetails> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/tv/${series_id}/season/${season_number}/episode/${episode_number}`, {
                 params: {
                     append_to_response: options?.appendToResponse
@@ -348,40 +387,47 @@ class TMDBService {
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn(`[TMDBService] Failed to fetch episode details for ${series_id} S${season_number}E${episode_number} from TMDB, using OMDb fallback`);
+            return this.omdbService.getTVEpisodesDetails(series_id, season_number, episode_number);
         }
     }
 
     async getTrending(mediaType: 'all' | 'movie' | 'tv', timeWindow: 'day' | 'week', page = 1): Promise<any> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/trending/${mediaType}/${timeWindow}`, {
                 params: { page }
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch trending from TMDB, using OMDb fallback');
+            return this.omdbService.getTrending(mediaType, timeWindow, page);
         }
     }
 
     async getUpcomingMovies(page = 1): Promise<any> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/upcoming`, {
                 params: { page }
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch upcoming movies from TMDB, using OMDb fallback');
+            return this.omdbService.getUpcomingMovies(page);
         }
     }
 
     async getNowPlayingMovies(page = 1): Promise<any> {
         try {
+            if (!this.apiKey) throw new Error('No TMDB key');
             const response = await this.axiosInstance.get(`/movie/now_playing`, {
                 params: { page }
             });
             return response.data;
         } catch (error) {
-            this.handleError(error);
+            console.warn('[TMDBService] Failed to fetch now playing movies from TMDB, using OMDb fallback');
+            return this.omdbService.getNowPlayingMovies(page);
         }
     }
 

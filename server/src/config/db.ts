@@ -1,25 +1,32 @@
 import "dotenv/config";
 import { PrismaClient } from "../generated/prisma/client.js";
-import { PrismaPg } from "@prisma/adapter-pg"; 
+import { withAccelerate } from "@prisma/extension-accelerate";
+import { PrismaPg } from "@prisma/adapter-pg";
+import pg from "pg";
 
-let prisma: PrismaClient;
+let prisma: any;
 
 const databaseUrl = process.env.DATABASE_URL;
 
 if (databaseUrl) {
   try {
-    const adapter = new PrismaPg({ 
-      connectionString: databaseUrl 
-    });
-
-    prisma = new PrismaClient({ adapter });
+    if (databaseUrl.startsWith("prisma://") || databaseUrl.startsWith("prisma+")) {
+      prisma = new (PrismaClient as any)({ accelerateUrl: databaseUrl }).$extends(withAccelerate());
+    } else {
+      const pool = new pg.Pool({ connectionString: databaseUrl });
+      const adapter = new PrismaPg(pool);
+      prisma = new (PrismaClient as any)({ adapter });
+    }
   } catch (error) {
-    console.error("Failed to parse DATABASE_URL, falling back:", error);
-    prisma = new PrismaClient({} as any);
+    console.error("Failed to initialize Prisma Client, falling back:", error);
+    try {
+      prisma = new (PrismaClient as any)({ accelerateUrl: databaseUrl });
+    } catch (e) {
+      prisma = {};
+    }
   }
 } else {
-  // Safe fallback for testing contexts where DATABASE_URL is not set
-  prisma = new PrismaClient({} as any);
+  prisma = {};
 }
 
 export default prisma;
