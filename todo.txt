@@ -1,3 +1,2 @@
-add omdbapi as a backup
 fix login and registration for prod
 fix fg image and landing page bg

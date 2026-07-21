@@ -20,6 +20,7 @@ import TvEpisodePlayPage from "./pages/TvEpisodePlay/TvEpisodePlayPage.js";
 import UserProfilePage from "./pages/UserProfile/UserProfilePage.js";
 import TrendingPage from "./pages/Trending/TrendingPage.js";
 import UpcomingPage from "./pages/Upcoming/UpcomingPage.js";
+import ErrorBoundary from "./components/Layout/ErrorBoundary";
 
 configure({ axios: api });
 
@@ -33,41 +34,43 @@ export default function App() {
 
         <div className="relative min-h-screen flex flex-col">
           <BrowserRouter>
-            <Routes>
-              {/* Public-only routes (unauthenticated users only) */}
-              <Route element={<PublicOnlyRoute />}>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-              </Route>
-
-              {/* Mixed routes: Layout is rendered for guests and members */}
-              <Route element={<Layout />}>
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/genre" />
-                <Route path="/countries" />
-                <Route path="/movies" element={<MovieDiscoveryPage />} />
-                <Route path="/tv" element={<TvDiscoveryPage />} />
-                <Route path="/trending" element={<TrendingPage />} />
-                <Route path="/upcoming" element={<UpcomingPage />} />
-                <Route path="/topIMDB" element={<TopIMDBPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
-                <Route path="/tv/:tvId" element={<TvDetailsPage />} />
-                <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
-
-                <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
-                <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
-
-                {/* Protected routes under Layout (authenticated users only) */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/profile" element={<UserProfilePage />} />
+            <ErrorBoundary>
+              <Routes>
+                {/* Public-only routes (unauthenticated users only) */}
+                <Route element={<PublicOnlyRoute />}>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
                 </Route>
-              </Route>
 
-              {/* Catch-all 404 Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                {/* Mixed routes: Layout is rendered for guests and members */}
+                <Route element={<Layout />}>
+                  <Route path="/home" element={<HomePage />} />
+                  <Route path="/genre" />
+                  <Route path="/countries" />
+                  <Route path="/movies" element={<MovieDiscoveryPage />} />
+                  <Route path="/tv" element={<TvDiscoveryPage />} />
+                  <Route path="/trending" element={<TrendingPage />} />
+                  <Route path="/upcoming" element={<UpcomingPage />} />
+                  <Route path="/topIMDB" element={<TopIMDBPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
+                  <Route path="/tv/:tvId" element={<TvDetailsPage />} />
+                  <Route path="/tv/:tvId/season/:season_number" element={<TvDetailsPage />} />
+
+                  <Route path="/movies/:movieId/play" element={<MoviePlayPage />} />
+                  <Route path="/tv/:tvId/season/:season_number/episode/:episode_number" element={<TvEpisodePlayPage />} />
+
+                  {/* Protected routes under Layout (authenticated users only) */}
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/profile" element={<UserProfilePage />} />
+                  </Route>
+                </Route>
+
+                {/* Catch-all 404 Route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ErrorBoundary>
           </BrowserRouter>
         </div>
       </div>
