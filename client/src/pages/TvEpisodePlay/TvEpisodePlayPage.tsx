@@ -6,6 +6,8 @@ import { RiArrowLeftLine, RiMovie2Line, RiArrowRightLine, RiStarFill, RiCalendar
 import { MediaDetails, VideoResult, Episode, Season } from '../../types/media.js';
 import { useAuth } from '../../context/AuthContext.js';
 
+import { getImageUrl } from '../../utils/image.js';
+
 type EpisodePlayDetails = Episode & {
   videos?: {
     results: VideoResult[];
@@ -201,7 +203,7 @@ export default function TvEpisodePlayPage() {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                Official Trailer
+                Trailer
               </button>
             )}
           </div>

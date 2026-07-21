@@ -6,6 +6,8 @@ import { RiArrowLeftLine, RiMovie2Line, RiStarFill, RiCalendarLine, RiTimeLine }
 import { MediaDetails, VideoResult } from '../../types/media.js';
 import { useAuth } from '../../context/AuthContext.js';
 
+import { getImageUrl } from '../../utils/image.js';
+
 export default function MoviePlayPage() {
   const { movieId } = useParams<{ movieId: string }>();
   const navigate = useNavigate();
@@ -78,13 +80,9 @@ export default function MoviePlayPage() {
     (video: VideoResult) => video.site === 'YouTube' && (video.type === 'Trailer' || video.type === 'Teaser' || video.type === 'Clip')
   );
 
-  const backdropUrl = movie.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : '';
+  const backdropUrl = getImageUrl(movie.backdrop_path, 'original');
 
-  const posterUrl = movie.poster_path
-    ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-    : '';
+  const posterUrl = getImageUrl(movie.poster_path, 'w300') || 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=300&auto=format&fit=crop';
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between select-none relative pb-12">
@@ -156,7 +154,7 @@ export default function MoviePlayPage() {
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Official Trailer
+              Trailer
             </button>
           )}
         </div>

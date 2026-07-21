@@ -83,7 +83,7 @@ body {
   animation: floatOrb2 30s infinite alternate ease-in-out;
 }
 
-/* Diagonal slow scroll for background grid */
+/* Diagonal slow scroll for background grid (Landing page) */
 @keyframes diagonalScroll {
   0% {
     transform: translate(-2%, -2%) rotate(-2deg);
@@ -138,4 +138,47 @@ body {
 
 .animate-fan-glow {
   animation: fanGlowPulse 7s ease-in-out infinite;
+}
+
+/* SUBTLE NON-DISTRACTING AMBIENT BOKEH & AURORA FOR INTERNAL PAGES */
+@keyframes floatParticleSlow {
+  0% {
+    transform: translateY(0px) translateX(0px) scale(0.8);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateY(-80px) translateX(30px) scale(1.15);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateY(-160px) translateX(-20px) scale(0.8);
+    opacity: 0.15;
+  }
+}
+
+.animate-particle-1 {
+  animation: floatParticleSlow 20s ease-in-out infinite alternate;
+}
+
+.animate-particle-2 {
+  animation: floatParticleSlow 26s ease-in-out infinite alternate-reverse;
+}
+
+.animate-particle-3 {
+  animation: floatParticleSlow 32s ease-in-out infinite alternate;
+}
+
+@keyframes auroraShift {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.2);
+    opacity: 0.25;
+  }
+}
+
+.animate-aurora {
+  animation: auroraShift 45s ease-in-out infinite;
 }

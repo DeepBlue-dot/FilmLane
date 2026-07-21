@@ -197,7 +197,7 @@ const NavBar: React.FC = () => {
           onClick={handleSearchSubmit}
           className="w-full text-center py-2 text-[11px] font-bold text-indigo-400 hover:text-indigo-300 hover:bg-indigo-600/5 transition-all uppercase tracking-wider cursor-pointer"
         >
-          View all results for &ldquo;{searchQuery}&rdquo;
+          View all results
         </button>
       </div>
     );
