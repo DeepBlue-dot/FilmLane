@@ -23,6 +23,8 @@ const NavBar: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on route changes
   useEffect(() => {
@@ -30,8 +32,14 @@ const NavBar: React.FC = () => {
     setProfileDropdownOpen(false);
     setGenresDropdownOpen(false);
     setMobileGenresOpen(false);
-    setShowDropdown(false);
-  }, [location.pathname]);
+
+    const isSearchPage = location.pathname === '/search';
+    const queryFromUrl = new URLSearchParams(location.search).get('query')?.trim() || '';
+
+    if (!isSearchPage || queryFromUrl.length < 2) {
+      setShowDropdown(false);
+    }
+  }, [location.pathname, location.search]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -39,9 +47,15 @@ const NavBar: React.FC = () => {
       const target = e.target as Node;
       const isInsideDesktop = desktopSearchRef.current?.contains(target);
       const isInsideMobile = mobileSearchRef.current?.contains(target);
+      const isInsideProfileButton = profileButtonRef.current?.contains(target);
+      const isInsideProfileDropdown = profileDropdownRef.current?.contains(target);
 
       if (!isInsideDesktop && !isInsideMobile) {
         setShowDropdown(false);
+      }
+
+      if (!isInsideProfileButton && !isInsideProfileDropdown) {
+        setProfileDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -97,6 +111,15 @@ const NavBar: React.FC = () => {
     const q = params.get('query');
     if (q) setSearchQuery(q);
   }, [location.search]);
+
+  // Keep search suggestions visible when already on the search page
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get('query')?.trim() || '';
+    if (q.length >= 2 && recommendations.length > 0) {
+      setShowDropdown(true);
+    }
+  }, [location.search, recommendations]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,6 +328,7 @@ const NavBar: React.FC = () => {
             {isAuthenticated ? (
               <div className="relative">
                 <button
+                  ref={profileButtonRef}
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-1.5 focus:outline-none cursor-pointer"
                 >
@@ -315,7 +339,7 @@ const NavBar: React.FC = () => {
 
                 {/* Dropdown Menu */}
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl py-1.5 text-sm z-50 animate-fade-in">
+                  <div ref={profileDropdownRef} className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl py-1.5 text-sm z-50 animate-fade-in">
                     <div className="px-4 py-2.5 border-b border-gray-800">
                       <p className="font-semibold text-white truncate">{user?.username}</p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>

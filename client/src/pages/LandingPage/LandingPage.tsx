@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../../components/NavBar/NavBar.js';
 import Footer from '../../components/Footer/Footer.js';
 import { api } from '../../services/api.js';
-import { RiSearchLine, RiArrowRightUpLine, RiStarFill, RiPlayFill, RiMagicLine, RiFilmLine } from 'react-icons/ri';
+import { RiSearchLine, RiArrowRightUpLine, RiStarFill, RiPlayFill, RiMagicLine } from 'react-icons/ri';
 
 interface TrendingMovie {
   id: number;
@@ -42,8 +42,6 @@ export default function LandingPage() {
       navigate(`/search?query=${encodeURIComponent(query.trim())}`);
     }
   };
-
-  const fanMovies = trending.slice(0, 7);
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-white relative overflow-x-hidden">
@@ -149,9 +147,9 @@ export default function LandingPage() {
           </div>
 
           {loadingTrending ? (
-            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory scroll-smooth">
+            <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory scroll-smooth">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="min-w-[220px] shrink-0 snap-start space-y-3">
+                <div key={i} className="min-w-[160px] sm:min-w-[180px] md:min-w-[200px] shrink-0 snap-start space-y-3">
                   <div className="aspect-[2/3] bg-slate-900 rounded-2xl animate-pulse" />
                   <div className="h-4 bg-slate-900 rounded w-3/4 animate-pulse" />
                   <div className="h-3 bg-slate-900 rounded w-1/2 animate-pulse" />
@@ -159,7 +157,7 @@ export default function LandingPage() {
               ))}
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory scroll-smooth">
+            <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar snap-x snap-mandatory scroll-smooth">
               {trending.map((movie) => {
                 const posterUrl = movie.poster_path
                   ? `https://image.tmdb.org/t/p/w342${movie.poster_path}`
@@ -168,7 +166,7 @@ export default function LandingPage() {
                   <Link
                     key={movie.id}
                     to={`/movies/${movie.id}`}
-                    className="group min-w-[220px] shrink-0 snap-start space-y-3 text-left block animate-fade-in"
+                    className="group min-w-[160px] sm:min-w-[180px] md:min-w-[200px] shrink-0 snap-start space-y-3 text-left block animate-fade-in"
                   >
                     <div className="aspect-[2/3] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 hover:border-indigo-500/60 shadow-xl relative group transition-all duration-300 hover:scale-[1.04]">
                       <img
