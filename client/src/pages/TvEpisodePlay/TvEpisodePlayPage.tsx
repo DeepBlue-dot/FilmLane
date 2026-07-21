@@ -6,7 +6,6 @@ import { RiArrowLeftLine, RiMovie2Line, RiArrowRightLine, RiStarFill, RiCalendar
 import { MediaDetails, VideoResult, Episode, Season } from '../../types/media.js';
 import { useAuth } from '../../context/AuthContext.js';
 
-import { getImageUrl } from '../../utils/image.js';
 
 type EpisodePlayDetails = Episode & {
   videos?: {
@@ -76,7 +75,7 @@ export default function TvEpisodePlayPage() {
     };
 
     fetchTvPlaybackData();
-  }, [tvId, season_number, episode_number, watchRecorded, isAuthenticated]);
+  }, [tvId, season_number, episode_number, watchRecorded, isAuthenticated, activeSeason, activeEpisode]);
 
   // Reset history tracker when navigating to a different episode
   useEffect(() => {
