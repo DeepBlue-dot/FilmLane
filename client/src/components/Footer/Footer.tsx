@@ -4,7 +4,7 @@ import { RiMovie2Line, RiFacebookBoxFill, RiTwitterXFill, RiInstagramFill, RiYou
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-950 border-t border-gray-900 text-gray-400 py-12">
+    <footer className="relative z-20 bg-slate-950 border-t border-slate-900 text-gray-400 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Intro */}
@@ -60,7 +60,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-900 text-center text-xs text-gray-600">
+        <div className="mt-12 pt-8 border-t border-slate-900 text-center text-xs text-gray-600">
           <p>© {new Date().getFullYear()} FilmLane. Developed as a premium movie discovery platform. All rights reserved.</p>
         </div>
       </div>

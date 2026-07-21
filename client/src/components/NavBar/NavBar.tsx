@@ -36,10 +36,11 @@ const NavBar: React.FC = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target as Node)) &&
-        (mobileSearchRef.current && !mobileSearchRef.current.contains(e.target as Node))
-      ) {
+      const target = e.target as Node;
+      const isInsideDesktop = desktopSearchRef.current?.contains(target);
+      const isInsideMobile = mobileSearchRef.current?.contains(target);
+
+      if (!isInsideDesktop && !isInsideMobile) {
         setShowDropdown(false);
       }
     };
