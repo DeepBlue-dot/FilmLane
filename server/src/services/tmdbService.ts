@@ -50,6 +50,49 @@ class TMDBService {
         }
     }
 
+    private async paginate24<T>(
+        page: number,
+        fetchPage: (tmdbPage: number) => Promise<PaginatedResponse<T>>
+    ): Promise<PaginatedResponse<T>> {
+        const targetPage = Math.max(1, page || 1);
+        const pageSize = 24;
+        const tmdbPageSize = 20;
+
+        const startIdx = (targetPage - 1) * pageSize;
+        const endIdx = targetPage * pageSize;
+
+        const firstTmdbPage = Math.min(500, Math.floor(startIdx / tmdbPageSize) + 1);
+        const lastTmdbPage = Math.min(500, Math.floor((endIdx - 1) / tmdbPageSize) + 1);
+
+        const [res1, res2] = await Promise.all([
+            fetchPage(firstTmdbPage),
+            lastTmdbPage !== firstTmdbPage ? fetchPage(lastTmdbPage) : Promise.resolve(null)
+        ]);
+
+        const results1 = res1.results || [];
+        const results2 = res2 ? (res2.results || []) : [];
+        const mergedResults = [...results1, ...results2];
+
+        const tmdbStartIdx = (firstTmdbPage - 1) * tmdbPageSize;
+        const sliceStart = startIdx - tmdbStartIdx;
+        const sliceEnd = endIdx - tmdbStartIdx;
+
+        const slicedResults = mergedResults.slice(sliceStart, sliceEnd);
+        const totalResults = res1.total_results || results1.length;
+        
+        // Cap total pages to what TMDB can support (max 500 pages of size 20)
+        const tmdbMaxPage = 500;
+        const maxPages24 = Math.floor((tmdbMaxPage * tmdbPageSize) / pageSize); // 416
+        const totalPages = Math.min(maxPages24, Math.ceil(totalResults / pageSize));
+
+        return {
+            page: targetPage,
+            results: slicedResults,
+            total_pages: totalPages,
+            total_results: totalResults
+        };
+    }
+
     async getCountriesList(): Promise<TMDBCountries[]> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
@@ -108,10 +151,12 @@ class TMDBService {
     async getSimilarMovies(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/movie/${movieId}/similar`, {
-                params: { page },
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/movie/${movieId}/similar`, {
+                    params: { page: p },
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn(`[TMDBService] Failed to fetch similar movies for ${movieId} from TMDB, using OMDb fallback`);
             return this.omdbService.getSimilarMovies(movieId, page);
@@ -121,10 +166,12 @@ class TMDBService {
     async getMovieRecommendations(movieId: number, page = 1): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/movie/${movieId}/recommendations`, {
-                params: { page },
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/movie/${movieId}/recommendations`, {
+                    params: { page: p },
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn(`[TMDBService] Failed to fetch recommendations for ${movieId} from TMDB, using OMDb fallback`);
             return this.omdbService.getMovieRecommendations(movieId, page);
@@ -170,14 +217,17 @@ class TMDBService {
             const transformedParams: Record<string, any> = {};
 
             for (const key in params) {
+                if (key === 'page') continue;
                 const mappedKey = paramMappings[key] || key;
                 transformedParams[mappedKey] = params[key as keyof DiscoverMoviesParams];
             }
 
-            const response = await this.axiosInstance.get('/discover/movie', {
-                params: transformedParams
+            return this.paginate24(Number(params.page) || 1, async (p) => {
+                const response = await this.axiosInstance.get('/discover/movie', {
+                    params: { ...transformedParams, page: p }
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to discover movies from TMDB, using OMDb fallback');
             return this.omdbService.discoverMovies(params);
@@ -187,8 +237,11 @@ class TMDBService {
     async searchMovie(options: { query: string, page: number, primary_release_year?: string, region?: string, year?: string }): Promise<PaginatedResponse<TMDBMovieResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/search/movie`, { params: { ...options } });
-            return response.data;
+            const { page, ...otherOptions } = options;
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/search/movie`, { params: { ...otherOptions, page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed to search movies (${options.query}) from TMDB, using OMDb fallback`);
             return this.omdbService.searchMovie(options);
@@ -198,8 +251,11 @@ class TMDBService {
     async searchAll(options: { query: string, page: number }): Promise<PaginatedResponse<MultiSearchResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/search/multi`, { params: { ...options } });
-            return response.data;
+            const { page, ...otherOptions } = options;
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/search/multi`, { params: { ...otherOptions, page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed multi-search (${options.query}) from TMDB, using OMDb fallback`);
             return this.omdbService.searchAll(options);
@@ -209,8 +265,11 @@ class TMDBService {
     async searchPerson(options: { query: string, page?: number }): Promise<PaginatedResponse<TMDBPersonResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/search/person`, { params: { ...options } });
-            return response.data;
+            const { page, ...otherOptions } = options;
+            return this.paginate24(page || 1, async (p) => {
+                const response = await this.axiosInstance.get(`/search/person`, { params: { ...otherOptions, page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed to search person (${options.query}) from TMDB, using OMDb fallback`);
             return this.omdbService.searchPerson(options);
@@ -220,8 +279,11 @@ class TMDBService {
     async searchTVShows(options: { query: string, page: number, first_air_date_year?: string, year?: string }): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/search/tv`, { params: { ...options } });
-            return response.data;
+            const { page, ...otherOptions } = options;
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/search/tv`, { params: { ...otherOptions, page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed to search TV shows (${options.query}) from TMDB, using OMDb fallback`);
             return this.omdbService.searchTVShows(options);
@@ -264,10 +326,12 @@ class TMDBService {
     async getPopularTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get('/tv/popular', {
-                params: { page },
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get('/tv/popular', {
+                    params: { page: p },
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to fetch popular TV shows from TMDB, using OMDb fallback');
             return this.omdbService.getPopularTVShows(page);
@@ -277,8 +341,10 @@ class TMDBService {
     async getTVSimilar(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/tv/${tvId}/similar`, { params: { page } });
-            return response.data;
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/tv/${tvId}/similar`, { params: { page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed to fetch similar TV shows for ${tvId} from TMDB, using OMDb fallback`);
             return this.omdbService.getTVSimilar(tvId, page);
@@ -288,8 +354,10 @@ class TMDBService {
     async getTVRecommendations(tvId: number, page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/tv/${tvId}/recommendations`, { params: { page } });
-            return response.data;
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/tv/${tvId}/recommendations`, { params: { page: p } });
+                return response.data;
+            });
         } catch (error) {
             console.warn(`[TMDBService] Failed to fetch TV recommendations for ${tvId} from TMDB, using OMDb fallback`);
             return this.omdbService.getTVRecommendations(tvId, page);
@@ -310,10 +378,12 @@ class TMDBService {
     async getTopRatedTVShows(page = 1): Promise<PaginatedResponse<TMDBTVShowResult>> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get('/tv/top_rated', {
-                params: { page },
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get('/tv/top_rated', {
+                    params: { page: p },
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to fetch top rated TV shows from TMDB, using OMDb fallback');
             return this.omdbService.getTopRatedTVShows(page);
@@ -348,14 +418,17 @@ class TMDBService {
             const transformedParams: Record<string, any> = {};
 
             for (const key in params) {
+                if (key === 'page') continue;
                 const mappedKey = paramMappingsTv[key] || key;
                 transformedParams[mappedKey] = params[key as keyof DiscoverTvShowParams];
             }
 
-            const response = await this.axiosInstance.get('/discover/tv', {
-                params: transformedParams,
+            return this.paginate24(Number(params.page) || 1, async (p) => {
+                const response = await this.axiosInstance.get('/discover/tv', {
+                    params: { ...transformedParams, page: p },
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to discover TV shows from TMDB, using OMDb fallback');
             return this.omdbService.discoverTvShows(params);
@@ -395,10 +468,12 @@ class TMDBService {
     async getTrending(mediaType: 'all' | 'movie' | 'tv', timeWindow: 'day' | 'week', page = 1): Promise<any> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/trending/${mediaType}/${timeWindow}`, {
-                params: { page }
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/trending/${mediaType}/${timeWindow}`, {
+                    params: { page: p }
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to fetch trending from TMDB, using OMDb fallback');
             return this.omdbService.getTrending(mediaType, timeWindow, page);
@@ -408,10 +483,12 @@ class TMDBService {
     async getUpcomingMovies(page = 1): Promise<any> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/movie/upcoming`, {
-                params: { page }
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/movie/upcoming`, {
+                    params: { page: p }
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to fetch upcoming movies from TMDB, using OMDb fallback');
             return this.omdbService.getUpcomingMovies(page);
@@ -421,10 +498,12 @@ class TMDBService {
     async getNowPlayingMovies(page = 1): Promise<any> {
         try {
             if (!this.apiKey) throw new Error('No TMDB key');
-            const response = await this.axiosInstance.get(`/movie/now_playing`, {
-                params: { page }
+            return this.paginate24(page, async (p) => {
+                const response = await this.axiosInstance.get(`/movie/now_playing`, {
+                    params: { page: p }
+                });
+                return response.data;
             });
-            return response.data;
         } catch (error) {
             console.warn('[TMDBService] Failed to fetch now playing movies from TMDB, using OMDb fallback');
             return this.omdbService.getNowPlayingMovies(page);

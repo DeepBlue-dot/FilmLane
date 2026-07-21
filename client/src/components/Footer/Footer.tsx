@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RiMovie2Line, RiFacebookBoxFill, RiTwitterXFill, RiInstagramFill, RiYoutubeFill } from 'react-icons/ri';
+import { api } from '../../services/api.js';
+import { Genre } from '../../types/media.js';
 
 const Footer: React.FC = () => {
   return (
@@ -37,14 +39,12 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Genres Links */}
+          {/* Genres Links (dynamic by TMDB genre id) */}
           <div>
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Explore</h3>
             <ul className="space-y-2.5 text-sm">
-              <li><Link to="/genre?type=action" className="hover:text-white transition-colors">Action & Adventure</Link></li>
-              <li><Link to="/genre?type=comedy" className="hover:text-white transition-colors">Comedies</Link></li>
-              <li><Link to="/genre?type=sci-fi" className="hover:text-white transition-colors">Sci-Fi & Fantasy</Link></li>
-              <li><Link to="/genre?type=drama" className="hover:text-white transition-colors">Drama & Romance</Link></li>
+              {/** Render top movie genres by id → link to movies filtered by genre id */}
+              <GenreList />
             </ul>
           </div>
 
@@ -69,3 +69,43 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
+
+// Small helper component to fetch and render top movie genres by id
+function GenreList() {
+  const [genres, setGenres] = useState<Genre[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchGenres = async () => {
+      try {
+        const res = await api.get('/genre/movie/list');
+        const list = res.data?.genres || res.data || [];
+        if (mounted) setGenres(list.slice(0, 6));
+      } catch (err) {
+        // silent
+      }
+    };
+    fetchGenres();
+    return () => { mounted = false; };
+  }, []);
+
+  if (!genres.length) {
+    return (
+      <>
+        <li className="text-sm text-gray-400">Loading genres…</li>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {genres.map((g) => (
+        <li key={`footer-genre-${g.id}`}>
+          <Link to={`/movies?genre=${g.id}`} className="hover:text-white transition-colors">
+            {g.name}
+          </Link>
+        </li>
+      ))}
+    </>
+  );
+}
