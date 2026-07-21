@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { Skeleton } from '../../components/ui/skeleton.js';
-import { RiArrowLeftLine, RiMovie2Line, RiStarFill } from 'react-icons/ri';
+import { RiArrowLeftLine, RiMovie2Line, RiStarFill, RiCalendarLine, RiTimeLine } from 'react-icons/ri';
 import { MediaDetails, VideoResult } from '../../types/media.js';
 import { useAuth } from '../../context/AuthContext.js';
 
@@ -82,8 +82,12 @@ export default function MoviePlayPage() {
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
     : '';
 
+  const posterUrl = movie.poster_path
+    ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+    : '';
+
   return (
-    <div className="min-h-screen max-h-screen h-screen overflow-hidden bg-gray-950 text-white flex flex-col justify-between select-none relative">
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between select-none relative pb-12">
       {/* Blurred Backdrop image for immersive atmosphere */}
       {backdropUrl && (
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -92,7 +96,7 @@ export default function MoviePlayPage() {
             alt="" 
             className="w-full h-full object-cover opacity-20 blur-3xl scale-110"
           />
-          <div className="absolute inset-0 bg-gray-950/85" />
+          <div className="absolute inset-0 bg-slate-950/85" />
         </div>
       )}
 
@@ -100,7 +104,7 @@ export default function MoviePlayPage() {
       <header className="p-4 sm:px-6 sm:py-4 bg-gradient-to-b from-black/60 to-transparent flex items-center justify-between z-10 relative">
         <button
           onClick={() => navigate(`/movies/${movieId}`)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-900/80 hover:bg-gray-800 border border-gray-800 text-sm font-semibold transition-all cursor-pointer shadow-lg hover:shadow-black/20"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-sm font-semibold transition-all cursor-pointer shadow-lg hover:shadow-black/20"
         >
           <RiArrowLeftLine className="w-4 h-4" />
           <span>Back</span>
@@ -114,15 +118,15 @@ export default function MoviePlayPage() {
         </div>
 
         <div className="flex items-center gap-1.5 text-indigo-500 font-extrabold text-sm tracking-wider">
-          <RiMovie2Line className="w-6 h-6" />
+          <RiMovie2Line className="w-6 h-6 animate-pulse" />
           <span>FILMLANE</span>
         </div>
       </header>
 
       {/* Main Video Section */}
-      <main className="flex-grow flex flex-col items-center justify-center p-4 md:px-8 md:py-2 z-10 relative space-y-4 w-full max-w-5xl mx-auto">
+      <main className="flex-grow flex flex-col items-center justify-center p-4 md:px-8 md:py-2 z-10 relative space-y-6 w-full max-w-5xl mx-auto">
         {/* Stream Selector Controls */}
-        <div className="flex bg-gray-900/90 border border-gray-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
+        <div className="flex bg-slate-900/90 border border-slate-800 rounded-xl p-1 select-none backdrop-blur-md shadow-lg shadow-black/40">
           <button
             onClick={() => setActiveSource('vidsrc')}
             className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
@@ -157,7 +161,8 @@ export default function MoviePlayPage() {
           )}
         </div>
 
-        <div className="w-full aspect-video bg-gray-950 rounded-2xl overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.8)] border border-gray-850 relative">
+        {/* Stream Player Viewport */}
+        <div className="w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border border-slate-800 relative">
           {activeSource === 'vidsrc' ? (
             <iframe
               src={`https://vidsrc-embed.ru/embed/movie/${movieId}`}
@@ -185,41 +190,70 @@ export default function MoviePlayPage() {
           ) : null}
         </div>
 
-        {/* Minimal Movie Info Panel */}
-        <div className="w-full flex items-center justify-between text-sm text-gray-400 px-1 mt-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-left">
-            <h2 className="text-base font-bold text-white leading-none">{movie.title}</h2>
-            <span className="w-1 h-1 rounded-full bg-gray-700" />
-            <span>{movie.release_date?.split('-')[0]}</span>
-            {movie.runtime && (
-              <>
-                <span className="w-1 h-1 rounded-full bg-gray-700" />
-                <span>{movie.runtime} min</span>
-              </>
-            )}
-            {movie.vote_average !== undefined && movie.vote_average > 0 && (
-              <>
-                <span className="w-1 h-1 rounded-full bg-gray-700" />
-                <span className="flex items-center gap-1 text-amber-400 font-bold">
+        {/* Foreground Movie Poster & Info Card */}
+        <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row gap-6 items-center sm:items-start text-left">
+          {posterUrl && (
+            <img 
+              src={posterUrl} 
+              alt={movie.title}
+              className="w-28 sm:w-36 aspect-[2/3] object-cover rounded-xl shadow-xl border border-slate-700/80 flex-shrink-0 hover:scale-105 transition-transform duration-300"
+            />
+          )}
+          <div className="flex-grow space-y-3 w-full">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-white leading-tight">
+                {movie.title}
+              </h2>
+              {movie.vote_average !== undefined && movie.vote_average > 0 && (
+                <span className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-xl text-xs font-extrabold border border-amber-500/20 shadow-sm">
                   <RiStarFill className="w-3.5 h-3.5" />
                   <span>{movie.vote_average.toFixed(1)}</span>
                 </span>
-              </>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 font-medium">
+              {movie.release_date && (
+                <span className="flex items-center gap-1">
+                  <RiCalendarLine className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>{movie.release_date.split('-')[0]}</span>
+                </span>
+              )}
+              {movie.runtime && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-slate-700" />
+                  <span className="flex items-center gap-1">
+                    <RiTimeLine className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>{movie.runtime} min</span>
+                  </span>
+                </>
+              )}
+              {movie.genres && movie.genres.length > 0 && (
+                <>
+                  <span className="w-1 h-1 rounded-full bg-slate-700" />
+                  <div className="flex items-center gap-1.5">
+                    {movie.genres.slice(0, 3).map((g) => (
+                      <span key={g.id} className="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-gray-300 text-[11px] font-medium">
+                        {g.name}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {movie.tagline && (
+              <p className="text-xs italic text-indigo-300 font-medium">&ldquo;{movie.tagline}&rdquo;</p>
+            )}
+
+            {movie.overview && (
+              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                {movie.overview}
+              </p>
             )}
           </div>
-          
-          {movie.genres && movie.genres.length > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-gray-300">
-              {movie.genres.slice(0, 3).map((g) => (
-                <span key={g.id} className="px-2 py-0.5 rounded bg-gray-900 border border-gray-800">
-                  {g.name}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       </main>
-
     </div>
   );
 }

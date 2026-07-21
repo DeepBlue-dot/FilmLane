@@ -5,13 +5,16 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "../services/asyncHandler.js";
 
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions: CookieOptions = {
+    path: "/",
     expires: new Date(
         Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN ?? 7) * 24 * 60 * 60 * 1000
     ),
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    httpOnly: true
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    httpOnly: true,
 };
 
 export const userRegester: RequestHandler = asyncHandler(
@@ -116,7 +119,10 @@ export const userLogin: RequestHandler = asyncHandler(
 export const userLogOut: RequestHandler = asyncHandler(
     async (req, res) => {
         res.cookie("jwt", "loggedout", {
+            path: "/",
             expires: new Date(Date.now()),
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
             httpOnly: true,
         });
 

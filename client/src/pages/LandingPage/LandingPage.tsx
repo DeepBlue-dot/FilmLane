@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../../components/NavBar/NavBar.js';
 import Footer from '../../components/Footer/Footer.js';
 import { api } from '../../services/api.js';
-import { RiMovie2Line, RiSearchLine, RiArrowRightUpLine, RiStarFill, RiPlayFill } from 'react-icons/ri';
+import { RiSearchLine, RiArrowRightUpLine, RiStarFill, RiPlayFill, RiMagicLine } from 'react-icons/ri';
 
 interface TrendingMovie {
   id: number;
@@ -26,7 +26,7 @@ export default function LandingPage() {
           params: { sortBy: 'popularity.desc', page: 1 }
         });
         const movies = response.data?.results || response.data || [];
-        setTrending(movies.slice(0, 6));
+        setTrending(movies.slice(0, 12));
       } catch (err) {
         console.error('Error fetching landing page trending movies', err);
       } finally {
@@ -43,24 +43,29 @@ export default function LandingPage() {
     }
   };
 
+
   return (
-    <div className="min-h-screen flex flex-col bg-transparent text-white relative overflow-x-hidden">
-      {/* Cinematic Poster Backdrop */}
+    <div className="min-h-screen flex flex-col bg-slate-950 text-white relative overflow-x-hidden">
+      {/* Enhanced Ambient Glowing Background & Fan Poster Grid */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none select-none -z-10 transition-opacity duration-1000">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(79,70,229,0.92),transparent_12%),radial-gradient(circle_at_bottom_right,rgba(236,72,153,0.85),transparent_12%)] blur-3xl animate-glow-pulse opacity-95 z-0" />
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950/90 to-slate-900/90 z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.24),transparent_50%)] mix-blend-screen opacity-90 z-0" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.04)_0%,rgba(15,23,42,0.15)_35%,rgba(15,23,42,0.55)_100%)] z-0" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(236,72,153,0.28),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.24),transparent_25%)] z-0" />
-        <div className="absolute inset-0 grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[130%] h-[130%] -translate-x-[15%] -translate-y-[15%] -rotate-2 animate-diagonal-scroll opacity-[0.12] z-10">
-          {Array.from({ length: 24 }).map((_, idx) => {
+        {/* Animated Radial Orbs */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[140px] animate-orb1" />
+        <div className="absolute bottom-0 right-1/4 w-[700px] h-[700px] bg-pink-600/15 rounded-full blur-[160px] animate-orb2" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[180px] animate-glow-pulse" />
+
+        {/* Dark Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/90 to-slate-950" />
+
+        {/* Diagonal Scrolling Poster Wall Layer */}
+        <div className="absolute inset-0 grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 gap-4 w-[140%] h-[140%] -translate-x-[20%] -translate-y-[20%] -rotate-3 animate-diagonal-scroll opacity-[0.10]">
+          {Array.from({ length: 32 }).map((_, idx) => {
             const movie = trending.length > 0 ? trending[idx % trending.length] : null;
             const posterUrl = movie?.poster_path
               ? `https://image.tmdb.org/t/p/w185${movie.poster_path}`
               : 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?q=80&w=185&auto=format&fit=crop';
             return (
-              <div key={idx} className="aspect-[2/3] rounded-3xl overflow-hidden border border-slate-600/80 shadow-[0_40px_160px_-120px_rgba(79,70,229,0.9)]">
-                <img src={posterUrl} alt="" className="w-full h-full object-cover filter brightness-130 contrast-130 saturate-150" />
+              <div key={idx} className="aspect-[2/3] rounded-2xl overflow-hidden border border-slate-700/60 shadow-2xl">
+                <img src={posterUrl} alt="" className="w-full h-full object-cover filter brightness-120 contrast-120" />
               </div>
             );
           })}
@@ -70,45 +75,45 @@ export default function LandingPage() {
       {/* Navigation Header */}
       <NavBar />
 
-      {/* Main Container */}
-      <main className="flex-grow z-10 space-y-24 pb-16">
+      {/* Main Content */}
+      <main className="flex-grow z-10 space-y-20 pb-20">
         
         {/* 1. Hero Section */}
-        <section className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 space-y-8 animate-fade-in-up">
+        <section className="max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 space-y-8 animate-fade-in-up">
           {/* Badge indicator */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold">
-            <RiMovie2Line className="w-3.5 h-3.5" />
-            Introducing FilmLane v1.1
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold tracking-wide shadow-lg shadow-indigo-500/10 backdrop-blur-md">
+            <RiMagicLine className="w-4 h-4 text-indigo-400 animate-pulse" />
+            Introducing FilmLane Cinema Universe
           </div>
 
           {/* Heading */}
           <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight leading-tight">
-            Navigate Your Personal{' '}
+            Explore Unlimited Movies &{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
-              Cinema Universe
+              TV Shows
             </span>
           </h1>
 
           {/* Description */}
-          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Get instant metadata, stream with multiple servers, build your custom watchlist, and track your history details including seasons and episodes.
+          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Get instant metadata, stream across multiple servers, build your custom watchlist, and track your viewing history seamlessly.
           </p>
 
-          {/* Search bar redirecting to search page */}
-          <form onSubmit={handleSearch} className="max-w-lg mx-auto relative flex items-center shadow-2xl">
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="max-w-xl mx-auto relative flex items-center shadow-2xl group">
             <input
               type="text"
-              placeholder="Search movies, TV shows, genres..."
+              placeholder="Search movies, TV shows, actors, genres..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full bg-gray-900/80 backdrop-blur border border-gray-800 focus:border-indigo-500 text-white rounded-full pl-12 pr-20 py-3.5 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all text-sm sm:text-base placeholder-gray-500"
+              className="w-full bg-slate-900/80 backdrop-blur-xl border border-slate-700 focus:border-indigo-500 text-white rounded-full pl-12 pr-28 py-4 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all text-sm sm:text-base placeholder-gray-400 shadow-inner"
             />
-            <RiSearchLine className="absolute left-4 w-5 h-5 text-gray-500" />
+            <RiSearchLine className="absolute left-4 w-5 h-5 text-gray-400 group-focus-within:text-indigo-400 transition-colors" />
             <button
               type="submit"
-              className="absolute right-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 font-bold text-xs sm:text-sm text-white rounded-full transition-all cursor-pointer shadow-lg hover:shadow-indigo-500/20"
+              className="absolute right-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-xs sm:text-sm text-white rounded-full transition-all cursor-pointer shadow-lg hover:shadow-indigo-500/30"
             >
-              Explore
+              Search
             </button>
           </form>
 
@@ -116,23 +121,23 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link
               to="/home"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full px-8 py-3.5 transition-all shadow-lg hover:shadow-indigo-500/20"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-full px-8 py-3.5 transition-all shadow-xl hover:shadow-indigo-500/30 cursor-pointer"
             >
-              Browse Movies & Shows
+              Browse Library
               <RiArrowRightUpLine className="w-4 h-4" />
             </Link>
             <Link
               to="/login"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-gray-900/60 hover:bg-gray-850 border border-gray-855 hover:border-gray-800 text-gray-300 hover:text-white font-bold rounded-full px-8 py-3.5 transition-all backdrop-blur-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-slate-900/80 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/40 text-gray-200 hover:text-white font-bold rounded-full px-8 py-3.5 transition-all backdrop-blur-md cursor-pointer"
             >
               Sign In
             </Link>
           </div>
         </section>
-
-        {/* 2. Live Trending Section */}
+        
+        {/* 3. Live Trending Grid */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-6 text-center md:text-left mb-10">
+          <div className="space-y-2 text-center md:text-left mb-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-wide">
               Trending Now on FilmLane
             </h2>
@@ -145,9 +150,9 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="space-y-3">
-                  <div className="aspect-[2/3] bg-gray-900 rounded-2xl animate-pulse" />
-                  <div className="h-4 bg-gray-900 rounded w-3/4 animate-pulse" />
-                  <div className="h-3 bg-gray-900 rounded w-1/2 animate-pulse" />
+                  <div className="aspect-[2/3] bg-slate-900 rounded-2xl animate-pulse" />
+                  <div className="h-4 bg-slate-900 rounded w-3/4 animate-pulse" />
+                  <div className="h-3 bg-slate-900 rounded w-1/2 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -163,7 +168,7 @@ export default function LandingPage() {
                     to={`/movies/${movie.id}`}
                     className="group space-y-3 text-left block animate-fade-in"
                   >
-                    <div className="aspect-[2/3] bg-gray-900 rounded-2xl overflow-hidden border border-gray-900 hover:border-indigo-500/30 shadow-lg relative group transition-all duration-300 hover:scale-[1.03]">
+                    <div className="aspect-[2/3] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 hover:border-indigo-500/50 shadow-lg relative group transition-all duration-300 hover:scale-[1.03]">
                       <img
                         src={posterUrl}
                         alt={movie.title}
@@ -176,7 +181,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                       {movie.vote_average !== undefined && movie.vote_average > 0 && (
-                        <div className="absolute top-2 right-2 bg-black/80 backdrop-blur text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-gray-800 text-amber-400 flex items-center gap-0.5">
+                        <div className="absolute top-2 right-2 bg-black/80 backdrop-blur text-[10px] font-extrabold px-2 py-0.5 rounded-lg border border-slate-800 text-amber-400 flex items-center gap-0.5">
                           <RiStarFill className="w-2.5 h-2.5" />
                           <span>{movie.vote_average.toFixed(1)}</span>
                         </div>
@@ -186,7 +191,7 @@ export default function LandingPage() {
                       <h3 className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors truncate">
                         {movie.title}
                       </h3>
-                      <p className="text-[10px] text-gray-500 font-medium">
+                      <p className="text-[10px] text-gray-400 font-medium">
                         {movie.release_date ? movie.release_date.split('-')[0] : 'N/A'}
                       </p>
                     </div>
@@ -196,7 +201,6 @@ export default function LandingPage() {
             </div>
           )}
         </section>
-
 
       </main>
 

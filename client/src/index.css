@@ -112,3 +112,30 @@ body {
 .animate-glow-pulse {
   animation: glowPulse 18s ease-in-out infinite;
 }
+
+/* Poster Fan Float & Fan Animation Keyframes */
+@keyframes fanFloatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(var(--fan-angle, 0deg));
+  }
+  50% {
+    transform: translateY(-14px) rotate(calc(var(--fan-angle, 0deg) + 2deg));
+  }
+}
+
+.animate-fan-float {
+  animation: fanFloatSlow 6s ease-in-out infinite;
+}
+
+@keyframes fanGlowPulse {
+  0%, 100% {
+    box-shadow: 0 20px 50px -10px rgba(79, 70, 229, 0.4);
+  }
+  50% {
+    box-shadow: 0 30px 70px -10px rgba(236, 72, 153, 0.6);
+  }
+}
+
+.animate-fan-glow {
+  animation: fanGlowPulse 7s ease-in-out infinite;
+}

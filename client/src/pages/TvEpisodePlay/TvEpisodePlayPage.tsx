@@ -238,47 +238,56 @@ export default function TvEpisodePlayPage() {
         {/* Info & Episode Selector Container */}
         <div className="w-full max-w-5xl flex flex-col gap-8">
           
-          {/* Episode metadata Card */}
-          <div className="bg-gray-900/40 border border-gray-850 rounded-2xl p-6 backdrop-blur-md shadow-xl flex flex-col md:flex-row gap-6">
+          {/* Foreground Series/Episode Poster & Metadata Card */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row gap-6 items-center sm:items-start text-left">
             {posterUrl && (
               <img 
                 src={posterUrl} 
                 alt={series.name}
-                className="w-32 h-48 object-cover rounded-xl shadow-lg border border-gray-800 self-center md:self-start flex-shrink-0"
+                className="w-28 sm:w-36 aspect-[2/3] object-cover rounded-xl shadow-xl border border-slate-700/80 flex-shrink-0 hover:scale-105 transition-transform duration-300"
               />
             )}
             
-            <div className="flex-grow space-y-4 text-left">
+            <div className="flex-grow space-y-3 w-full">
               <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white leading-tight">
                     {series.name} - &ldquo;{episode.name}&rdquo;
                   </h2>
                   {episode.vote_average !== undefined && episode.vote_average > 0 && (
-                    <span className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-lg text-xs font-bold border border-amber-500/20">
+                    <span className="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-xl text-xs font-extrabold border border-amber-500/20 shadow-sm">
                       <RiStarFill className="w-3.5 h-3.5" />
                       <span>{episode.vote_average.toFixed(1)}</span>
                     </span>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-4 text-xs text-gray-400 mt-2 font-medium">
-                  <span className="text-indigo-400 font-bold uppercase tracking-wider">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mt-2 font-medium">
+                  <span className="text-indigo-400 font-extrabold uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
                     Season {activeSeason} • Episode {activeEpisode}
                   </span>
                   {episode.air_date && (
                     <span className="flex items-center gap-1">
-                      <RiCalendarLine className="w-3.5 h-3.5" />
+                      <RiCalendarLine className="w-3.5 h-3.5 text-indigo-400" />
                       <span>{episode.air_date}</span>
                     </span>
+                  )}
+                  {series.genres && series.genres.length > 0 && (
+                    <div className="flex items-center gap-1.5 ml-1">
+                      {series.genres.slice(0, 3).map((g) => (
+                        <span key={g.id} className="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-gray-300 text-[11px]">
+                          {g.name}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
 
               {episode.overview && (
-                <div className="space-y-1">
+                <div className="space-y-1 pt-1">
                   <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Episode Synopsis</h3>
-                  <p className="text-sm text-gray-300 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal">
                     {episode.overview}
                   </p>
                 </div>
